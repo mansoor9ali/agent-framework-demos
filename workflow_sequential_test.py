@@ -1,0 +1,59 @@
+# pip install agent-framework-devui==1.0.0b251016
+import asyncio
+import os
+from typing import Any
+
+from agent_framework import WorkflowOutputEvent, SequentialBuilder, ChatMessage, Role
+from agent_framework.openai import OpenAIChatClient
+from agent_framework_devui import serve
+from dotenv import load_dotenv
+from rich import print
+# Load environment variables from .env file
+load_dotenv()
+
+client = OpenAIChatClient(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        base_url=os.getenv("OPENAI_BASE_URL"),
+        model_id=os.getenv("OPENAI_MODEL_ID"),
+    )
+
+writer = client.create_agent(
+    instructions=(
+        "You are a concise copywriter. Provide a single, punchy marketing sentence based on the prompt."
+    ),
+    name="writer",
+)
+
+reviewer = client.create_agent(
+    instructions=(
+        "You are a thoughtful reviewer. Give brief feedback on the previous assistant message."
+    ),
+    name="reviewer",
+)
+
+# 2) Build sequential workflow: writer -> reviewer
+workflow = SequentialBuilder().participants([writer, reviewer]).build()
+
+
+async def main() -> None:
+    completion: WorkflowOutputEvent | None = None
+    async for event in workflow.run_stream("Write a tagline for a budget-friendly eBike."):
+        if isinstance(event, WorkflowOutputEvent):
+            completion = event
+
+
+    if completion:
+        print("===== Final Conversation =====",flush=True)
+        messages: list[ChatMessage] | Any = completion.data
+        print(f"Total messages: {len(messages)}", flush=True)
+        for i, msg in enumerate(messages, start=1):
+            name = msg.author_name or ("assistant" if msg.role == Role.ASSISTANT else "user")
+            print(f"{'-' * 60}\n{i:02d} [{name}]\n{msg.text}")
+
+
+
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+    serve(entities=[workflow], port=8093, auto_open=True)
