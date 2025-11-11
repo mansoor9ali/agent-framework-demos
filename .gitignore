@@ -49,6 +49,7 @@ coverage.xml
 .pytest_cache/
 cover/
 
+
 # Translations
 *.mo
 *.pot
@@ -146,3 +147,5 @@ cython_debug/
 # Project specific
 *.log
 
+/examples/
+/example_data/
