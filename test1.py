@@ -7,7 +7,8 @@ from typing import Annotated
 
 from agent_framework.openai import OpenAIChatClient
 from dotenv import load_dotenv
-
+from rich import print
+from rich.logging import RichHandler
 # Load environment variables from .env file
 load_dotenv()
 

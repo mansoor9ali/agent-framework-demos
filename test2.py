@@ -10,7 +10,8 @@ from agent_framework import ChatAgent
 from agent_framework.openai import OpenAIChatClient
 from pydantic import Field
 from dotenv import load_dotenv
-
+from rich import print
+from rich.logging import RichHandler
 # Load environment variables from .env file
 load_dotenv()
 
