@@ -22,7 +22,7 @@ Prerequisites:
     - `az login` (Azure CLI authentication)
     - Environment variables configured for AzureOpenAIChatClient
 """
-
+import os
 import asyncio
 from collections.abc import AsyncIterable
 from typing import cast
@@ -37,11 +37,15 @@ from agent_framework import (
     WorkflowRunState,
     WorkflowStatusEvent,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+from agent_framework_devui import serve
+from dotenv import load_dotenv
+from rich import print
+# Load environment variables from .env file
+load_dotenv()
 
 
-def create_agents(chat_client: AzureOpenAIChatClient):
+def create_agents(chat_client: OpenAIChatClient):
     """Create triage and specialist agents with multi-tier handoff capabilities.
 
     Returns:
@@ -137,41 +141,44 @@ def _print_handoff_request(request: HandoffUserInputRequest) -> None:
         print(f"  {speaker}: {text}")
     print("============================")
 
+"""
+This sample shows:
+1. Triage agent routes to replacement specialist
+2. Replacement specialist hands off to delivery specialist
+3. Delivery specialist can hand off to billing if needed
+4. All transitions are seamless without returning to user until complete
 
-async def main() -> None:
-    """Demonstrate specialist-to-specialist handoffs in a multi-tier support scenario.
+The workflow configuration explicitly defines which agents can hand off to which others:
+- triage_agent → replacement_agent, delivery_agent, billing_agent
+- replacement_agent → delivery_agent, billing_agent
+- delivery_agent → billing_agent
+"""
+chat_client = OpenAIChatClient(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("OPENAI_BASE_URL"),
+    model_id=os.getenv("OPENAI_MODEL_ID"),
+)
+triage, replacement, delivery, billing = create_agents(chat_client)
 
-    This sample shows:
-    1. Triage agent routes to replacement specialist
-    2. Replacement specialist hands off to delivery specialist
-    3. Delivery specialist can hand off to billing if needed
-    4. All transitions are seamless without returning to user until complete
-
-    The workflow configuration explicitly defines which agents can hand off to which others:
-    - triage_agent → replacement_agent, delivery_agent, billing_agent
-    - replacement_agent → delivery_agent, billing_agent
-    - delivery_agent → billing_agent
-    """
-    chat_client = AzureOpenAIChatClient(credential=AzureCliCredential())
-    triage, replacement, delivery, billing = create_agents(chat_client)
-
-    # Configure multi-tier handoffs using fluent add_handoff() API
-    # This allows specialists to hand off to other specialists
-    workflow = (
-        HandoffBuilder(
-            name="multi_tier_support",
-            participants=[triage, replacement, delivery, billing],
-        )
-        .set_coordinator(triage)
-        .add_handoff(triage, [replacement, delivery, billing])  # Triage can route to any specialist
-        .add_handoff(replacement, [delivery, billing])  # Replacement can delegate to delivery or billing
-        .add_handoff(delivery, billing)  # Delivery can escalate to billing
-        # Termination condition: Stop when more than 4 user messages exist.
-        # This allows agents to respond to the 4th user message before the 5th triggers termination.
-        # In this sample: initial message + 3 scripted responses = 4 messages, then 5th message ends workflow.
-        .with_termination_condition(lambda conv: sum(1 for msg in conv if msg.role.value == "user") > 4)
-        .build()
+# Configure multi-tier handoffs using fluent add_handoff() API
+# This allows specialists to hand off to other specialists
+workflow = (
+    HandoffBuilder(
+        name="multi_tier_support",
+        participants=[triage, replacement, delivery, billing],
     )
+    .set_coordinator(triage)
+    .add_handoff(triage, [replacement, delivery, billing])  # Triage can route to any specialist
+    .add_handoff(replacement, [delivery, billing])  # Replacement can delegate to delivery or billing
+    .add_handoff(delivery, billing)  # Delivery can escalate to billing
+    # Termination condition: Stop when more than 4 user messages exist.
+    # This allows agents to respond to the 4th user message before the 5th triggers termination.
+    # In this sample: initial message + 3 scripted responses = 4 messages, then 5th message ends workflow.
+    .with_termination_condition(lambda conv: sum(1 for msg in conv if msg.role.value == "user") > 4)
+    .build()
+)
+async def main() -> None:
+    """Demonstrate specialist-to-specialist handoffs in a multi-tier support scenario."""
 
     # Scripted user responses simulating a multi-tier handoff scenario
     # Note: The initial run_stream() call sends the first user message,
@@ -283,4 +290,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    serve(entities=[workflow], port=8093, auto_open=True)
+    #asyncio.run(main())

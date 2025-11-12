@@ -1,5 +1,5 @@
 # Copyright (c) Microsoft. All rights reserved.
-
+import os
 import asyncio
 from collections.abc import AsyncIterable
 from typing import cast
@@ -12,8 +12,12 @@ from agent_framework import (
     WorkflowEvent,
     WorkflowOutputEvent,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+from agent_framework_devui import serve
+from dotenv import load_dotenv
+from rich import print
+# Load environment variables from .env file
+load_dotenv()
 
 """Sample: Handoff workflow with return-to-previous routing enabled.
 
@@ -65,7 +69,7 @@ Key Concepts:
 """
 
 
-def create_agents(chat_client: AzureOpenAIChatClient) -> tuple[ChatAgent, ChatAgent, ChatAgent, ChatAgent]:
+def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, ChatAgent, ChatAgent]:
     """Create and configure the coordinator and specialist agents.
 
     Returns:
@@ -146,37 +150,40 @@ async def _drain(stream: AsyncIterable[WorkflowEvent]) -> list[WorkflowEvent]:
         events.append(event)
     return events
 
+"""Demonstrate return-to-previous routing in a handoff workflow."""
+chat_client = OpenAIChatClient(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("OPENAI_BASE_URL"),
+    model_id=os.getenv("OPENAI_MODEL_ID"),
+)
+coordinator, technical, account, billing = create_agents(chat_client)
 
-async def main() -> None:
-    """Demonstrate return-to-previous routing in a handoff workflow."""
-    chat_client = AzureOpenAIChatClient(credential=AzureCliCredential())
-    coordinator, technical, account, billing = create_agents(chat_client)
+print("Handoff Workflow with Return-to-Previous Routing")
+print("=" * 60)
+print("\nThis interactive demo shows how user inputs route directly")
+print("to the specialist handling your request, avoiding unnecessary")
+print("coordinator re-evaluation on each turn.")
+print("\nSpecialists can hand off directly to other specialists when")
+print("your request changes topics (e.g., from technical to billing).")
+print("\nType 'exit' or 'quit' to end the conversation.\n")
 
-    print("Handoff Workflow with Return-to-Previous Routing")
-    print("=" * 60)
-    print("\nThis interactive demo shows how user inputs route directly")
-    print("to the specialist handling your request, avoiding unnecessary")
-    print("coordinator re-evaluation on each turn.")
-    print("\nSpecialists can hand off directly to other specialists when")
-    print("your request changes topics (e.g., from technical to billing).")
-    print("\nType 'exit' or 'quit' to end the conversation.\n")
-
-    # Configure handoffs with return-to-previous enabled
-    # Specialists can hand off directly to other specialists when topic changes
-    workflow = (
-        HandoffBuilder(
-            name="return_to_previous_demo",
-            participants=[coordinator, technical, account, billing],
-        )
-        .set_coordinator(coordinator)
-        .add_handoff(coordinator, [technical, account, billing])  # Coordinator routes to all specialists
-        .add_handoff(technical, [billing, account])  # Technical can route to billing or account
-        .add_handoff(account, [technical, billing])  # Account can route to technical or billing
-        .add_handoff(billing, [technical, account])  # Billing can route to technical or account
-        .enable_return_to_previous(True)  # Enable the `return to previous handoff` feature
-        .with_termination_condition(lambda conv: sum(1 for msg in conv if msg.role.value == "user") >= 10)
-        .build()
+# Configure handoffs with return-to-previous enabled
+# Specialists can hand off directly to other specialists when topic changes
+workflow = (
+    HandoffBuilder(
+        name="return_to_previous_demo",
+        participants=[coordinator, technical, account, billing],
     )
+    .set_coordinator(coordinator)
+    .add_handoff(coordinator, [technical, account, billing])  # Coordinator routes to all specialists
+    .add_handoff(technical, [billing, account])  # Technical can route to billing or account
+    .add_handoff(account, [technical, billing])  # Account can route to technical or billing
+    .add_handoff(billing, [technical, account])  # Billing can route to technical or account
+    .enable_return_to_previous(True)  # Enable the `return to previous handoff` feature
+    .with_termination_condition(lambda conv: sum(1 for msg in conv if msg.role.value == "user") >= 10)
+    .build()
+)
+async def main() -> None:
 
     # Get initial user request
     initial_request = input("You: ").strip()  # noqa: ASYNC250
@@ -291,4 +298,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    serve(entities=[workflow], port=8093, auto_open=True)
+    #asyncio.run(main())
