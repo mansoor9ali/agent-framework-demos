@@ -10,6 +10,8 @@ from typing import AsyncIterator, Awaitable, Callable, Optional
 from dotenv import load_dotenv
 import azure.cognitiveservices.speech as speechsdk
 
+from .idle import IdleController
+
 
 class VoiceIO:
     """Wrap Azure STT/TTS setup and streaming helpers."""
@@ -94,12 +96,14 @@ class AdvancedVoiceAgentSystem:
         responder: Callable[[str], AsyncIterator[object]],
         before_loop: Optional[Callable[[], Awaitable[None]]] = None,
         after_loop: Optional[Callable[[], Awaitable[None]]] = None,
+        idle_controller: Optional[IdleController] = None,
     ) -> None:
         self.voice = VoiceIO()
         self.loop = self.voice.loop
         self.responder = responder
         self.before_loop = before_loop
         self.after_loop = after_loop
+        self.idle = idle_controller or IdleController()
 
     def run(self) -> None:
         stop_event = asyncio.Event()
@@ -114,7 +118,12 @@ class AdvancedVoiceAgentSystem:
             while not stop_event.is_set():
                 user_input = await self.voice.listen_once()
                 if not user_input:
+                    self.idle.record_idle()
+                    if self.idle.should_stop():
+                        print("⚠️  No activity detected. Exiting loop.")
+                        stop_event.set()
                     continue
+                self.idle.record_activity()
                 await self.voice.stream_reply(user_input, self.responder)
 
         async def wrapped_loop() -> None:
