@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-11-15T14:22:14.323678",
+  "message_number": 2,
+  "thread_data": {
+    "type": "agent_thread_state",
+    "service_thread_id": null,
+    "chat_message_store_state": {
+      "type": "chat_message_store_state",
+      "messages": []
+    }
+  }
+}

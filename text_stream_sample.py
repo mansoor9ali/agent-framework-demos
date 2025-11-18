@@ -17,7 +17,7 @@ gpt_client =  OpenAI(
 # IMPORTANT: MUST use the websocket v2 endpoint
 speech_config = speechsdk.SpeechConfig(
     endpoint=f"wss://{os.getenv('AZURE_TTS_REGION')}.tts.speech.microsoft.com/cognitiveservices/websocket/v2",
-    subscription=os.getenv("AZURE_TTS_SUBSCRIPTIONKEY")
+    subscription=os.getenv("AZURE_TTS_SUBSCRIPTIONKEY2")
 )
 
 # Configure the voice for speech synthesis. For a complete list of available voices,
