@@ -9,14 +9,6 @@ from utils import create_gptoss120b_client , create_deepseek_client
 # File to save thread history
 THREAD_FILE = "thread_history.json"
 
-# Custom JSON encoder for Pydantic models
-class PydanticEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if hasattr(obj, 'model_dump'):
-            return obj.model_dump(mode='json')
-        return super().default(obj)
-
-
 
 
 async def main():
