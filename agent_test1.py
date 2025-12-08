@@ -1,16 +1,13 @@
 # Copyright (c) Microsoft. All rights reserved.
 
 import asyncio
-import os
 from random import randint
 from typing import Annotated
-
-from agent_framework.openai import OpenAIChatClient
-from dotenv import load_dotenv
 from rich import print
-from rich.logging import RichHandler
+from utils import create_openai_client
+
 # Load environment variables from .env file
-load_dotenv()
+
 
 """
 OpenAI Chat Client Basic Example
@@ -32,11 +29,7 @@ async def non_streaming_example() -> None:
     """Example of non-streaming response (get the complete result at once)."""
     print("=== Non-streaming Response Example ===")
 
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_openai_client().create_agent(
         name="WeatherAgent",
         instructions="You are a helpful weather agent.",
         tools=get_weather,
@@ -52,11 +45,7 @@ async def streaming_example() -> None:
     """Example of streaming response (get results as they are generated)."""
     print("=== Streaming Response Example ===")
 
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_openai_client().create_agent(
         name="WeatherAgent",
         instructions="You are a helpful weather agent.",
         tools=get_weather,
