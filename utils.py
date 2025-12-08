@@ -7,7 +7,7 @@ from agent_framework.openai import OpenAIChatClient
 load_dotenv()
 
 
-def create_openai_client() -> OpenAIChatClient:
+def create_gptoss120b_client() -> OpenAIChatClient:
     """
     Create and return an OpenAIChatClient instance with environment variables.
 
