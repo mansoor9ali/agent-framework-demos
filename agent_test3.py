@@ -1,15 +1,15 @@
 # Copyright (c) Microsoft. All rights reserved.
-import os
 import asyncio
 from random import randint
 from typing import Annotated
 
 from agent_framework import AgentThread, ChatAgent, ChatMessageStore
-from agent_framework.openai import OpenAIChatClient
-from pydantic import Field
 from dotenv import load_dotenv
+from pydantic import Field
 from rich import print
-from rich.logging import RichHandler
+
+from utils import create_gptoss120b_client
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -34,11 +34,7 @@ async def example_with_automatic_thread_creation() -> None:
     print("=== Automatic Thread Creation Example ===")
 
     agent = ChatAgent(
-        chat_client=OpenAIChatClient(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            base_url=os.getenv("OPENAI_BASE_URL"),
-            model_id=os.getenv("OPENAI_MODEL_ID"),
-        ),
+        chat_client=create_gptoss120b_client(),
         instructions="You are a helpful weather agent.",
         tools=get_weather,
     )
@@ -63,11 +59,7 @@ async def example_with_thread_persistence() -> None:
     print("Using the same thread across multiple conversations to maintain context.\n")
 
     agent = ChatAgent(
-        chat_client=OpenAIChatClient(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            base_url=os.getenv("OPENAI_BASE_URL"),
-            model_id=os.getenv("OPENAI_MODEL_ID"),
-        ),
+        chat_client=create_gptoss120b_client(),
         instructions="You are a helpful weather agent.",
         tools=get_weather,
     )
@@ -100,11 +92,7 @@ async def example_with_existing_thread_messages() -> None:
     print("=== Existing Thread Messages Example ===")
 
     agent = ChatAgent(
-        chat_client=OpenAIChatClient(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            base_url=os.getenv("OPENAI_BASE_URL"),
-            model_id=os.getenv("OPENAI_MODEL_ID"),
-        ),
+        chat_client=create_gptoss120b_client(),
         instructions="You are a helpful weather agent.",
         tools=get_weather,
     )
@@ -126,11 +114,7 @@ async def example_with_existing_thread_messages() -> None:
 
     # Create a new agent instance but use the existing thread with its message history
     new_agent = ChatAgent(
-        chat_client=OpenAIChatClient(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            base_url=os.getenv("OPENAI_BASE_URL"),
-            model_id=os.getenv("OPENAI_MODEL_ID"),
-        ),
+        chat_client=create_gptoss120b_client(),
         instructions="You are a helpful weather agent.",
         tools=get_weather,
     )

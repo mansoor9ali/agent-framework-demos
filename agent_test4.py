@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Annotated
 
 from agent_framework import ChatAgent
-from agent_framework.openai import OpenAIChatClient
+from utils import create_gptoss120b_client
 
 from dotenv import load_dotenv
 from pydantic import Field
@@ -24,11 +24,7 @@ load_dotenv()
 
 
 async_credential = None
-client = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    )
+client = create_gptoss120b_client()
 
 # ----------------------------------------------------------------------------------
 # Sub-agent 1 tools: weekend planning
