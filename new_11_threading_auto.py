@@ -3,13 +3,8 @@ import os
 import json
 from datetime import datetime
 
-from agent_framework.openai import OpenAIChatClient
-from dotenv import load_dotenv
+from utils import create_gptoss120b_client , create_deepseek_client
 
-
-
-# Load environment variables
-load_dotenv()
 
 # File to save thread history
 THREAD_FILE = "thread_history.json"
@@ -21,10 +16,7 @@ class PydanticEncoder(json.JSONEncoder):
             return obj.model_dump(mode='json')
         return super().default(obj)
 
-ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
-DEPLOYMENT = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT_NAME")
-API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
+
 
 
 async def main():
@@ -35,11 +27,7 @@ async def main():
     print("="*70)
     
     # Create agent
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_deepseek_client().create_agent(
         instructions="You are a helpful assistant. Remember everything the user tells you and refer back to it.",
         name="MemoryBot"
     )
