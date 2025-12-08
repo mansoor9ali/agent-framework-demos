@@ -6,20 +6,11 @@ The agent can perform mathematical calculations.
 """
 
 import asyncio
-import os
 from typing import Annotated
+
 from pydantic import Field
-from dotenv import load_dotenv
 
-from agent_framework.openai import OpenAIChatClient
-
-# Load environment variables
-load_dotenv()
-
-ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
-DEPLOYMENT = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT_NAME")
-API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-07-01-preview")
+from utils import create_gptoss120b_client
 
 
 # Define calculator function
@@ -54,11 +45,7 @@ async def main():
     print("="*70)
     
     # Create agent with calculator tool
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_gptoss120b_client().create_agent(
         instructions="You are a math assistant. Use the calculate tool for math problems.",
         name="CalculatorBot",
         tools=[calculate]

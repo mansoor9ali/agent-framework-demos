@@ -8,11 +8,8 @@ The agent is persistent and will be saved to Azure AI Foundry service.
 """
 
 import asyncio
-import os
 from dotenv import load_dotenv
-from agent_framework.openai import OpenAIChatClient
-from agent_framework import ChatAgent
-from azure.ai.projects.aio import AIProjectClient
+from utils import create_gptoss120b_client
 
 # Load environment variables
 load_dotenv()
@@ -24,11 +21,7 @@ async def main():
     print("🤖 DEMO: Create Azure AI Foundry Agent (Interactive)")
     print("="*70)
 
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_gptoss120b_client().create_agent(
         name="DemoAgent",
         instructions="You are a helpful AI assistant. Be concise and friendly."
     )

@@ -5,7 +5,8 @@ from typing import Optional
 
 from dotenv import load_dotenv
 import azure.cognitiveservices.speech as speechsdk
-from agent_framework.openai import OpenAIChatClient
+
+from utils import create_gptoss120b_client
 
 
 class AzureVoiceAgent:
@@ -13,11 +14,7 @@ class AzureVoiceAgent:
         load_dotenv()
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
-        self.chat_agent = OpenAIChatClient(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            base_url=os.getenv("OPENAI_BASE_URL"),
-            model_id=os.getenv("OPENAI_MODEL_ID"),
-        ).create_agent(
+        self.chat_agent = create_gptoss120b_client().create_agent(
             name="VoiceDemoAgent",
             instructions="You are a helpful voice assistant."
         )

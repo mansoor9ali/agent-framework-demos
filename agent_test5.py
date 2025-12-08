@@ -1,16 +1,12 @@
 # Copyright (c) Microsoft. All rights reserved.
 
 import asyncio
-import os
-from random import randint
-from typing import Annotated
 
-from agent_framework.openai import OpenAIChatClient
 from dotenv import load_dotenv
-from rich import print
-from rich.logging import RichHandler
 from pydantic import BaseModel
+from rich import print
 
+from utils import create_gptoss120b_client
 
 # Load environment variables from .env file
 load_dotenv()
@@ -26,11 +22,7 @@ async def example() -> None:
     """Example of non-streaming response (get the complete result at once)."""
     print("=== Non-streaming Response Example ===")
 
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_gptoss120b_client().create_agent(
         name="HelpfulAssistant",
         instructions="You are a helpful assistant that extracts person information from text."
     )

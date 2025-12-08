@@ -13,7 +13,7 @@ import asyncio
 import os
 from typing import Annotated
 
-from agent_framework.openai import OpenAIChatClient
+from utils import create_gptoss120b_client
 from pydantic import Field
 from dotenv import load_dotenv
 from datetime import datetime
@@ -78,11 +78,7 @@ async def main():
     print("="*70)
     
     # Create agent with multiple tools
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_gptoss120b_client().create_agent(
         instructions="You are a helpful assistant with weather, calculator, and time tools. Choose the right tool automatically.",
         name="MultiToolBot",
         tools=[get_weather, calculate, get_time]
