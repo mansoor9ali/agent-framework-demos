@@ -19,3 +19,16 @@ def create_gptoss120b_client() -> OpenAIChatClient:
         base_url=os.getenv("OPENAI_BASE_URL"),
         model_id=os.getenv("OPENAI_MODEL_ID"),
     )
+
+def create_deepseek_client() -> OpenAIChatClient:
+    """
+    Create and return an OpenAIChatClient instance with environment variables.
+
+    Returns:
+        OpenAIChatClient: Configured OpenAI chat client
+    """
+    return OpenAIChatClient(
+        api_key=os.getenv("DEEPSEEK_API_KEY"),
+        base_url=os.getenv("DEEPSEEK_BASE_URL"),
+        model_id=os.getenv("DEEPSEEK_MODEL_ID"),
+    )

@@ -8,7 +8,7 @@ The agent returns typed Python objects instead of plain text.
 import asyncio
 import os
 
-from agent_framework.openai import OpenAIChatClient
+from utils import create_gptoss120b_client
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -28,17 +28,13 @@ class PersonInfo(BaseModel):
 
 async def main():
     """Interactive demo: Structured output extraction."""
-    
+
     print("\n" + "="*70)
     print("📊 DEMO: Structured Output with Pydantic")
     print("="*70)
-    
+
     # Create agent
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_gptoss120b_client().create_agent(
         instructions="Extract person information from the user's text.",
         name="ExtractorBot"
     )

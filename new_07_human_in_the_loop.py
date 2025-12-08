@@ -11,8 +11,7 @@ This uses a custom ApprovalRequiredTool wrapper (same pattern as file 11)
 import asyncio
 import os
 from typing import Annotated, Callable
-
-from agent_framework.openai import OpenAIChatClient
+from utils import create_gptoss120b_client
 from pydantic import Field
 from dotenv import load_dotenv
 from pathlib import Path
@@ -230,11 +229,7 @@ async def main():
     
     # Create agent with both functions
     # create_file runs immediately, delete_file asks for approval
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_gptoss120b_client().create_agent(
         instructions="""You are a file management assistant with access to file operations.
 
 IMPORTANT: You MUST call the functions directly. Do NOT ask the user for permission in chat.

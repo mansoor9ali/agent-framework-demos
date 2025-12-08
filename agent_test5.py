@@ -27,17 +27,17 @@ async def example() -> None:
         instructions="You are a helpful assistant that extracts person information from text."
     )
 
-    query = "Please provide information about John Smith, who is a 35-year-old software engineer."
+    query = "Please provide information about John Smith, who is a 35-year-old software engineer and lives in New york City."
     print(f"User: {query}")
 
     result = await agent.run(
-        "Please provide information about John Smith, who is a 35-year-old software engineer.",
+        "Please provide information about John Smith, who is a 35-year-old software engineer and lives in New york City.",
          response_format = PersonInfo
     )
 
     if result.value:
         person_info = result.value
-        print(f"Name: {person_info.name}, Age: {person_info.age}, Occupation: {person_info.occupation}")
+        print(f"Name: {person_info.name}, Age: {person_info.age}, Occupation: {person_info.occupation} , City: {getattr(person_info, 'city', 'N/A')}")
     else:
         print("No structured data found in result")
 
