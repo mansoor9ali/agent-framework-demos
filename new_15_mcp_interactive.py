@@ -2,12 +2,40 @@
 import asyncio
 import os
 
-from agent_framework.openai import OpenAIChatClient
+from utils import create_gptoss120b_client
 from dotenv import load_dotenv
 from agent_framework import MCPStdioTool
+from typing import Callable, Awaitable
 
-load_dotenv()
+from agent_framework import (
+    AgentRunContext,
+    FunctionInvocationContext,
+    ChatContext,
+    agent_middleware,
+    function_middleware,
+    chat_middleware
+)
 
+
+# ============================================================================
+# MIDDLEWARE 3: FUNCTION LOGGER (Function Middleware)
+# ============================================================================
+
+@function_middleware
+async def function_logger_middleware(
+        context: FunctionInvocationContext,
+        next: Callable[[FunctionInvocationContext], Awaitable[None]],
+) -> None:
+    """Logs every function/tool call with arguments and results."""
+
+    print(f"\n🔧 [FUNCTION] Calling tool: {context.function.name}")
+    print(f"🔧 [FUNCTION] Arguments: {context.arguments}")
+
+    # Execute the function
+    await next(context)
+
+    # Log the result
+    print(f"🔧 [FUNCTION] Result: {context.result}")
 
 
 async def main():
@@ -40,7 +68,7 @@ Let's start!
             name="calculator",
             command="uvx.exe",
             args=["mcp-server-calculator"]
-        ) as mcp_server:
+        ) as mcp_calculator:
             
             print("✅ MCP server started successfully!\n")
             
@@ -48,17 +76,16 @@ Let's start!
             print("Creating agent with MCP calculator tools...")
 
             
-            agent = OpenAIChatClient(
-                        api_key=os.getenv("OPENAI_API_KEY"),
-                        base_url=os.getenv("OPENAI_BASE_URL"),
-                        model_id=os.getenv("OPENAI_MODEL_ID"),
-                    ).create_agent(
+            agent = create_gptoss120b_client().create_agent(
                 instructions=(
                     "You are a helpful math assistant. "
                     "Use the calculator tools for all mathematical calculations. "
                     "Show your work and explain the steps."
                 ),
-                tools=mcp_server
+                tools=mcp_calculator,
+                middleware=[
+                    function_logger_middleware,  # Function middleware
+                ]
             )
             
             print("✅ Agent ready with MCP calculator!\n")

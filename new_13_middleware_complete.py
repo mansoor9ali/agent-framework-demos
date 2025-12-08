@@ -2,7 +2,7 @@ import asyncio
 import os
 from datetime import datetime
 
-from agent_framework.openai import OpenAIChatClient
+from utils import  create_deepseek_client, create_gptoss120b_client
 from dotenv import load_dotenv
 from typing import Callable, Awaitable
 
@@ -110,7 +110,7 @@ async def token_counter_middleware(
     total_chars = sum(len(str(msg)) for msg in context.messages)
     estimated_input_tokens = total_chars // 4
     
-    print(f"\n🤖 [AI CALL] Sending request to Deepseek3.1")
+    print(f"\n🤖 [AI CALL] Sending request to gpt-oss-120b")
     print(f"🤖 [AI CALL] Messages: {len(context.messages)}")
     print(f"🤖 [AI CALL] Estimated input tokens: ~{estimated_input_tokens}")
     
@@ -196,11 +196,7 @@ Watch how they all work together in a real conversation!
     print("\n🔧 Creating agent with all 4 middleware...\n")
     
     # Create agent with all middleware
-    agent = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    ).create_agent(
+    agent = create_gptoss120b_client().create_agent(
         instructions="""You are a helpful assistant with access to various tools.
         Be friendly, concise, and helpful in your responses.""",
         tools=[get_weather, calculate, get_time, search_database],
