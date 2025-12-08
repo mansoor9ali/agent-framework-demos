@@ -3,14 +3,11 @@ import asyncio
 import json
 from datetime import datetime
 
-from agent_framework.openai import OpenAIChatClient
-from dotenv import load_dotenv
+from utils import create_deepseek_client
 
 from agent_framework import ContextProvider, Context, ChatMessage
 from openai import OpenAI
 
-# Load environment
-load_dotenv()
 
 # File for persisting memory profile only
 MEMORY_FILE = "ai_memory_profile.json"
@@ -174,11 +171,7 @@ async def main():
     print("   ✅ AI memory analyzer initialized")
     
     # Create Azure OpenAI agent
-    agent = OpenAIChatClient(
-        api_key=os.getenv("DEEPSEEK_API_KEY"),
-        base_url=os.getenv("DEEPSEEK_BASE_URL"),
-        model_id=os.getenv("DEEPSEEK_MODEL_ID"),
-    ).create_agent(
+    agent = create_deepseek_client().create_agent(
         instructions="""You are a helpful, friendly assistant with long-term memory.
         
 When you recognize information about the user from their profile:
