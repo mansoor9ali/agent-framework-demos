@@ -4,7 +4,7 @@ import asyncio
 from random import randint
 from typing import Annotated
 from rich import print
-from utils import create_gptoss120b_client
+from utils import create_gptoss120b_client , create_foundrylocal_client
 
 # Load environment variables from .env file
 
@@ -61,7 +61,18 @@ async def streaming_example() -> None:
 
 
 async def main() -> None:
-    print("=== Basic OpenAI Chat Client Agent Example ===")
+    # print("=== Basic OpenAI Chat Client Agent Example ===")
+    #
+    #
+    # agent = create_foundrylocal_client().create_agent(
+    #     name="HelpfulAgent",
+    #     instructions="You are a helpful agent."
+    # )
+    #
+    # query = "Tell about cricket in 200 words."
+    # print(f"User: {query}")
+    # result = await agent.run(query)
+    # print(f"Result: {result}\n")
 
     await non_streaming_example()
     await streaming_example()
