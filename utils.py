@@ -48,7 +48,6 @@ def create_foundrylocal_client() -> OpenAIChatClient:
         model_id=model_info.id,
     )
 
-
 def create_gptoss120b_client() -> OpenAIChatClient:
     """
     Create and return an OpenAIChatClient instance with environment variables.

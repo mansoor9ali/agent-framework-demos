@@ -1,0 +1,81 @@
+{
+  "timestamp": "2025-12-08T14:45:05.256784",
+  "message_number": 2,
+  "thread_data": {
+    "type": "agent_thread_state",
+    "service_thread_id": null,
+    "chat_message_store_state": {
+      "type": "chat_message_store_state",
+      "messages": [
+        {
+          "type": "chat_message",
+          "role": {
+            "type": "role",
+            "value": "user"
+          },
+          "contents": [
+            {
+              "type": "text",
+              "annotations": null,
+              "text": "tell me about cricket in 50 words"
+            }
+          ],
+          "author_name": null,
+          "message_id": null,
+          "additional_properties": {}
+        },
+        {
+          "type": "chat_message",
+          "role": {
+            "type": "role",
+            "value": "assistant"
+          },
+          "contents": [
+            {
+              "type": "text",
+              "annotations": null,
+              "text": "Cricket is a bat-and-ball sport played between two teams of 11 players. Originating in England, it is popular in countries like India, Australia, and England. Matches can last hours (T20) to days (Test cricket). The aim is to score more runs than the opponent by hitting the ball and running between wickets."
+            }
+          ],
+          "author_name": "MemoryBot",
+          "message_id": "6a714b5c-079d-4549-b44c-9c7c904d04a3",
+          "additional_properties": {}
+        },
+        {
+          "type": "chat_message",
+          "role": {
+            "type": "role",
+            "value": "user"
+          },
+          "contents": [
+            {
+              "type": "text",
+              "annotations": null,
+              "text": "what we talking last time"
+            }
+          ],
+          "author_name": null,
+          "message_id": null,
+          "additional_properties": {}
+        },
+        {
+          "type": "chat_message",
+          "role": {
+            "type": "role",
+            "value": "assistant"
+          },
+          "contents": [
+            {
+              "type": "text",
+              "annotations": null,
+              "text": "Last time, you asked me to explain cricket in about 50 words. I described it as a bat-and-ball sport with two teams of 11 players, originating in England and popular in countries like India and Australia. I also mentioned match formats ranging from short T20 games to multi-day Test matches, with the goal of scoring more runs than the opponent."
+            }
+          ],
+          "author_name": "MemoryBot",
+          "message_id": "eb51c538-7b99-41ed-87a8-7017858c8907",
+          "additional_properties": {}
+        }
+      ]
+    }
+  }
+}

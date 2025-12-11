@@ -23,7 +23,6 @@ logger.setLevel(logging.INFO)
 load_dotenv()
 
 
-async_credential = None
 client = create_gptoss120b_client()
 
 # ----------------------------------------------------------------------------------
@@ -62,20 +61,21 @@ def get_current_date() -> str:
     return datetime.now().strftime("%Y-%m-%d")
 
 
-weekend_agent = ChatAgent(
-    chat_client=client,
-    instructions=(
-        "You help users plan their weekends and choose the best activities for the given weather. "
-        "If an activity would be unpleasant in the weather, don't suggest it. "
-        "Include the date of the weekend in your response."
-    ),
-    tools=[get_weather, get_activities, get_current_date],
-)
+
 
 
 async def plan_weekend(query: str) -> str:
     """Plan a weekend based on user query and return the final response."""
     logger.info("Tool: plan_weekend invoked")
+    weekend_agent = ChatAgent(
+        chat_client=client,
+        instructions=(
+            "You help users plan their weekends and choose the best activities for the given weather. "
+            "If an activity would be unpleasant in the weather, don't suggest it. "
+            "Include the date of the weekend in your response."
+        ),
+        tools=[get_weather, get_activities, get_current_date],
+    )
     response = await weekend_agent.run(query)
     return response.text
 
@@ -127,46 +127,47 @@ def check_fridge() -> list[str]:
     return items
 
 
-meal_agent = ChatAgent(
-    chat_client=client,
-    instructions=(
-        "You help users plan meals and choose the best recipes. "
-        "Include the ingredients and cooking instructions in your response. "
-        "Indicate what the user needs to buy from the store when their fridge is missing ingredients."
-    ),
-    tools=[find_recipes, check_fridge],
-)
+
 
 
 async def plan_meal(query: str) -> str:
     """Plan a meal based on user query and return the final response."""
     logger.info("Tool: plan_meal invoked")
+    meal_agent = ChatAgent(
+        chat_client=client,
+        instructions=(
+            "You help users plan meals and choose the best recipes. "
+            "Include the ingredients and cooking instructions in your response. "
+            "Indicate what the user needs to buy from the store when their fridge is missing ingredients."
+        ),
+        tools=[find_recipes, check_fridge],
+    )
     response = await meal_agent.run(query)
     return response.text
 
 
-# ----------------------------------------------------------------------------------
-# Supervisor agent orchestrating sub-agents
-# ----------------------------------------------------------------------------------
 
-supervisor_agent = ChatAgent(
-    chat_client=client,
-    instructions=(
-        "You are a supervisor managing two specialist agents: a weekend planning agent and a meal planning agent. "
-        "Break down the user's request, decide which specialist (or both) to call via the available tools, "
-        "and then synthesize a final helpful answer. When invoking a tool, provide clear, concise queries."
-    ),
-    tools=[plan_weekend, plan_meal],
-)
 
 
 async def main():
+    # ----------------------------------------------------------------------------------
+    # Supervisor agent orchestrating sub-agents
+    # ----------------------------------------------------------------------------------
+
+    supervisor_agent = ChatAgent(
+        chat_client=client,
+        instructions=(
+            "You are a supervisor managing two specialist agents: a weekend planning agent and a meal planning agent. "
+            "Break down the user's request, decide which specialist (or both) to call via the available tools, "
+            "and then synthesize a final helpful answer. When invoking a tool, provide clear, concise queries."
+        ),
+        tools=[plan_weekend, plan_meal],
+    )
     user_query = "my kids want pasta for dinner"
     response = await supervisor_agent.run(user_query)
     print(response.text)
 
-    if async_credential:
-        await async_credential.close()
+
 
 
 if __name__ == "__main__":

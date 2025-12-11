@@ -16,6 +16,9 @@ from agent_framework.openai import OpenAIChatClient
 from agent_framework_devui import serve
 from dotenv import load_dotenv
 from rich import print
+
+from utils import create_deepseek_client, create_foundrylocal_client , create_gptoss120b_client
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -69,13 +72,13 @@ Key Concepts:
 """
 
 
-def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, ChatAgent, ChatAgent]:
+def create_agents(deepseek_chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, ChatAgent, ChatAgent]:
     """Create and configure the coordinator and specialist agents.
 
     Returns:
         Tuple of (coordinator, technical_support, account_specialist, billing_agent)
     """
-    coordinator = chat_client.create_agent(
+    coordinator = deepseek_chat_client.create_agent(
         instructions=(
             "You are a customer support coordinator. Analyze the user's request and route to "
             "the appropriate specialist:\n"
@@ -89,7 +92,7 @@ def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, 
         name="coordinator",
     )
 
-    technical_support = chat_client.create_agent(
+    technical_support = deepseek_chat_client.create_agent(
         instructions=(
             "You provide technical support. Help users troubleshoot technical issues, "
             "arrange repairs, and answer technical questions. "
@@ -100,7 +103,7 @@ def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, 
         name="technical_support",
     )
 
-    account_specialist = chat_client.create_agent(
+    account_specialist = deepseek_chat_client.create_agent(
         instructions=(
             "You handle account management. Help with profile updates, account settings, "
             "and preferences. Gather information through conversation. "
@@ -110,7 +113,7 @@ def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, 
         name="account_specialist",
     )
 
-    billing_agent = chat_client.create_agent(
+    billing_agent = deepseek_chat_client.create_agent(
         instructions=(
             "You handle billing only. Process payments, explain invoices, handle refunds. "
             "If the user asks about technical issues or troubleshooting, hand off to technical_support. "
@@ -151,12 +154,8 @@ async def _drain(stream: AsyncIterable[WorkflowEvent]) -> list[WorkflowEvent]:
     return events
 
 """Demonstrate return-to-previous routing in a handoff workflow."""
-chat_client = OpenAIChatClient(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    base_url=os.getenv("OPENAI_BASE_URL"),
-    model_id=os.getenv("OPENAI_MODEL_ID"),
-)
-coordinator, technical, account, billing = create_agents(chat_client)
+
+coordinator, technical, account, billing = create_agents(create_gptoss120b_client())
 
 print("Handoff Workflow with Return-to-Previous Routing")
 print("=" * 60)

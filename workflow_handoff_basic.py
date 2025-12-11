@@ -1,34 +1,30 @@
 # pip install agent-framework-devui==1.0.0b251016
-import asyncio
-import os
 from typing import Any
 
-from agent_framework import WorkflowOutputEvent, SequentialBuilder, ChatMessage, Role, HandoffBuilder
-from agent_framework.openai import OpenAIChatClient
+from agent_framework import WorkflowOutputEvent, ChatMessage, Role, HandoffBuilder
 from agent_framework_devui import serve
 from dotenv import load_dotenv
 from rich import print
+
+from utils import create_deepseek_client
+
 # Load environment variables from .env file
 load_dotenv()
 
-client = OpenAIChatClient(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_BASE_URL"),
-        model_id=os.getenv("OPENAI_MODEL_ID"),
-    )
 
 
-historyTutor = client.create_agent(
+
+historyTutor = create_deepseek_client().create_agent(
     instructions="You provide assistance with historical queries. Explain important events and context clearly. Only respond about history.",
      name="history_tutor",
     description="Specialist agent for historical questions")
 
-mathTutor = client.create_agent(
+mathTutor = create_deepseek_client().create_agent(
     instructions="You provide help with math problems. Explain your reasoning at each step and include examples. Only respond about math.",
      name="math_tutor",
      description="Specialist agent for math questions")
 
-triageAgent = client.create_agent(
+triageAgent = create_deepseek_client().create_agent(
     instructions="You determine which agent to use based on the user's homework question. ALWAYS handoff to another agent.",
      name="triage_agent",
      description="Routes messages to the appropriate specialist agent")

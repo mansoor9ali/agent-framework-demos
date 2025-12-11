@@ -18,6 +18,9 @@ from agent_framework import (
 from agent_framework_devui import serve
 from dotenv import load_dotenv
 from rich import print
+
+from utils import create_deepseek_client
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -48,7 +51,7 @@ Key Concepts:
 """
 
 
-def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, ChatAgent, ChatAgent]:
+def create_agents(deepseek_chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, ChatAgent, ChatAgent]:
     """Create and configure the triage and specialist agents.
 
     The triage agent is responsible for:
@@ -65,7 +68,7 @@ def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, 
     # Triage agent: Acts as the frontline dispatcher
     # NOTE: The instructions explicitly tell it to call the correct handoff tool when routing.
     # The HandoffBuilder intercepts these tool calls and routes to the matching specialist.
-    triage = chat_client.create_agent(
+    triage = deepseek_chat_client.create_agent(
         instructions=(
             "You are frontline support triage. Read the latest user message and decide whether "
             "to hand off to refund_agent, order_agent, or support_agent. Provide a brief natural-language "
@@ -76,7 +79,7 @@ def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, 
     )
 
     # Refund specialist: Handles refund requests
-    refund = chat_client.create_agent(
+    refund = deepseek_chat_client.create_agent(
         instructions=(
             "You handle refund workflows. Ask for any order identifiers you require and outline the refund steps."
         ),
@@ -84,7 +87,7 @@ def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, 
     )
 
     # Order/shipping specialist: Resolves delivery issues
-    order = chat_client.create_agent(
+    order = deepseek_chat_client.create_agent(
         instructions=(
             "You resolve shipping and fulfillment issues. Clarify the delivery problem and describe the actions "
             "you will take to remedy it."
@@ -93,7 +96,7 @@ def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, 
     )
 
     # General support specialist: Fallback for other issues
-    support = chat_client.create_agent(
+    support = deepseek_chat_client.create_agent(
         instructions=(
             "You are a general support agent. Offer empathetic troubleshooting and gather missing details if the "
             "issue does not match other specialists."
@@ -188,14 +191,9 @@ def _print_handoff_request(request: HandoffUserInputRequest) -> None:
  #    the demo reproducible and testable. In a production application, you would
  #    replace the scripted_responses with actual user input collection.
 
-chat_client = OpenAIChatClient(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    base_url=os.getenv("OPENAI_BASE_URL"),
-    model_id=os.getenv("OPENAI_MODEL_ID"),
-)
 
 # Create all agents: triage + specialists
-triage, refund, order, support = create_agents(chat_client)
+triage, refund, order, support = create_agents(create_deepseek_client())
 
 # Build the handoff workflow
 # - participants: All agents that can participate (triage MUST be first or explicitly set as set_coordinator)
@@ -340,5 +338,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    #serve(entities=[workflow], port=8093, auto_open=True)
-    asyncio.run(main())
+    serve(entities=[workflow], port=8093, auto_open=True)
+    #asyncio.run(main())
