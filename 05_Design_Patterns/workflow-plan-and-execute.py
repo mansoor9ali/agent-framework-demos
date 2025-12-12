@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft. All rights reserved.
 
 import asyncio
-from typing import Any
 
 from agent_framework import (
     AgentRunUpdateEvent,
@@ -74,57 +73,58 @@ def create_executor_agent(client: OpenAIChatClient) -> ChatAgent:
 async def main() -> None:
     print("Initializing Plan-and-Execute Agent Workflow...\n")
 
-    async with create_openaichat_client() as client:
+    # Create the OpenAI chat client (not an async context manager)
+    client = create_openaichat_client()
 
-        # Build the workflow: Planner -> Executor
-        # This mirrors the pattern where the plan is handed over to the controller.
-        workflow = (
-            WorkflowBuilder()
-            # Phase 1: Reasoning/Planning
-            .register_agent(lambda: create_planner_agent(client), name="planner")
+    # Build the workflow: Planner -> Executor
+    # This mirrors the pattern where the plan is handed over to the controller.
+    workflow = (
+        WorkflowBuilder()
+        # Phase 1: Reasoning/Planning
+        .register_agent(lambda: create_planner_agent(client), name="planner")
 
-            # Phase 2: Execution/Controller
-            .register_agent(lambda: create_executor_agent(client), name="executor", output_response=True)
+        # Phase 2: Execution/Controller
+        .register_agent(lambda: create_executor_agent(client), name="executor", output_response=True)
 
-            # Define the linear flow: User -> Planner -> Executor -> Output
-            .set_start_executor("planner")
-            .add_edge("planner", "executor")
-            .build()
-        )
+        # Define the linear flow: User -> Planner -> Executor -> Output
+        .set_start_executor("planner")
+        .add_edge("planner", "executor")
+        .build()
+    )
 
-        # Example Task: Complex venue planning scenario from the transcript[cite: 4].
-        user_request = (
-            "I need to organize a half-day team offsite meeting for 15 people next month. "
-            "It needs to be in-person, engaging, and include catering."
-        )
+    # Example Task: Complex venue planning scenario from the transcript[cite: 4].
+    user_request = (
+        "I need to organize a half-day team offsite meeting for 15 people next month. "
+        "It needs to be in-person, engaging, and include catering."
+    )
 
-        print(f"User Request: {user_request}\n")
-        print("-" * 50)
+    print(f"User Request: {user_request}\n")
+    print("-" * 50)
 
-        last_executor_id: str | None = None
+    last_executor_id: str | None = None
 
-        # Execute the workflow using streaming to observe the hand-off
-        events = workflow.run_stream(user_request)
+    # Execute the workflow using streaming to observe the hand-off
+    events = workflow.run_stream(user_request)
 
-        async for event in events:
-            if isinstance(event, AgentRunUpdateEvent):
-                eid = event.executor_id
+    async for event in events:
+        if isinstance(event, AgentRunUpdateEvent):
+            eid = event.executor_id
 
-                # Visual separation between agents (Plan phase vs Execute phase)
-                if eid != last_executor_id:
-                    if last_executor_id is not None:
-                        print("\n" + "-" * 50 + "\n")  # Separator between phases
+            # Visual separation between agents (Plan phase vs Execute phase)
+            if eid != last_executor_id:
+                if last_executor_id is not None:
+                    print("\n" + "-" * 50 + "\n")  # Separator between phases
 
-                    # Labeling the phases based on the pattern
-                    phase_label = "PHASE 1: PLANNING" if eid == "planner" else "PHASE 2: EXECUTION"
-                    print(f"[{phase_label}] ({eid}):", end=" ", flush=True)
-                    last_executor_id = eid
+                # Labeling the phases based on the pattern
+                phase_label = "PHASE 1: PLANNING" if eid == "planner" else "PHASE 2: EXECUTION"
+                print(f"[{phase_label}] ({eid}):", end=" ", flush=True)
+                last_executor_id = eid
 
-                print(event.data, end="", flush=True)
+            print(event.data, end="", flush=True)
 
-            elif isinstance(event, WorkflowOutputEvent):
-                print("\n\n" + "=" * 20 + " Final Output " + "=" * 20)
-                print(event.data)
+        elif isinstance(event, WorkflowOutputEvent):
+            print("\n\n" + "=" * 20 + " Final Output " + "=" * 20)
+            print(event.data)
 
 
 if __name__ == "__main__":
