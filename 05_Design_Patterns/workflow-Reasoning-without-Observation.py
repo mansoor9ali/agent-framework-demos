@@ -160,6 +160,10 @@ async def run_reasoning_without_observation_workflow(user_request: str):
 
     # Clean response if LLM adds markdown blocks
     cleaned_json = raw_response.replace("```json", "").replace("```", "").strip()
+    print("===============================================")
+    print("Planner Raw Output:")
+    print(cleaned_json)
+    print("===============================================")
 
     # Try to fix potentially truncated or malformed JSON
     def try_parse_json(json_str: str):
