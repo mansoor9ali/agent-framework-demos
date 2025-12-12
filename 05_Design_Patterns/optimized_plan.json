@@ -1,0 +1,54 @@
+{
+  "request_summary": "Launch a new line of spicy coffee beans with market insights and marketing strategy, followed by legal compliance check.",
+  "execution_stages": [
+    {
+      "stage_number": 1,
+      "stage_name": "Initial Research and Marketing Strategy",
+      "description": "Conduct market research on spicy coffee trends and develop marketing messaging.",
+      "agents": [
+        {
+          "agent_name": "researcher",
+          "task": "Conduct market research",
+          "sub_tasks": [
+            "Investigate current consumer trends in flavored coffee",
+            "Analyze competitive products in the spicy coffee segment",
+            "Identify potential market opportunities and risks associated with spicy coffee"
+          ],
+          "expected_output": "Market report detailing current trends, competitive analysis, opportunities, and risks."
+        },
+        {
+          "agent_name": "marketer",
+          "task": "Develop marketing messaging",
+          "sub_tasks": [
+            "Create a catchy and appealing marketing blurb for the spicy coffee",
+            "Define the target demographic for the spicy coffee line",
+            "Develop value propositions highlighting the unique aspects of spicy coffee"
+          ],
+          "expected_output": "A compelling marketing blurb and a defined target demographic profile with value propositions."
+        }
+      ],
+      "dependencies": [],
+      "can_run_parallel": true
+    },
+    {
+      "stage_number": 2,
+      "stage_name": "Review Stage",
+      "description": "Legal review of previous outputs to ensure compliance with advertising laws and regulations.",
+      "agents": [
+        {
+          "agent_name": "legal",
+          "task": "Review and validate",
+          "sub_tasks": [
+            "Review marketing claims for compliance with truth-in-advertising laws",
+            "Check for compliance with any health-related claims or warnings required"
+          ],
+          "expected_output": "Compliance report ensuring all marketing material meets legal standards."
+        }
+      ],
+      "dependencies": ["stage_1"],
+      "can_run_parallel": false
+    }
+  ],
+  "total_stages": 2,
+  "optimization_notes": "This ordering allows for initial research and marketing to influence each other without delay, and ensures legal compliance before any launch phases, reducing risk of legal issues."
+}
