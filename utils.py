@@ -1,12 +1,11 @@
-# utils.py
 import os
+import sys
 
-import openai
-from dotenv import load_dotenv
 from agent_framework.openai import OpenAIChatClient
+from dotenv import load_dotenv
 from foundry_local import FoundryLocalManager
 from foundry_local.models import DeviceType
-import sys
+
 if sys.version_info >= (3, 11):
     from enum import StrEnum
 
@@ -48,7 +47,20 @@ def create_foundrylocal_client() -> OpenAIChatClient:
         model_id=model_info.id,
     )
 
-def create_gptoss120b_client() -> OpenAIChatClient:
+def create_synthetic_client() -> OpenAIChatClient:
+    """
+    Create and return an OpenAIChatClient instance with environment variables.
+
+    Returns:
+        OpenAIChatClient: Configured OpenAI chat client
+    """
+    return OpenAIChatClient(
+        api_key=os.getenv("SYNTHETIC_API_KEY"),
+        base_url=os.getenv("SYNTHETIC_BASE_URL"),
+        model_id=os.getenv("SYNTHETIC_MODEL_ID"),
+    )
+
+def create_openaichat_client() -> OpenAIChatClient:
     """
     Create and return an OpenAIChatClient instance with environment variables.
 
