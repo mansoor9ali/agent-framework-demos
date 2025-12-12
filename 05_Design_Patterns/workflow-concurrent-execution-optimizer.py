@@ -345,7 +345,7 @@ async def run_optimizer_workflow(user_request: str):
     raw_plan = raw_plan.replace("```json", "").replace("```", "").strip()
 
     # Save to file for inspection
-    plan_file_path = "05_Design_Patterns/optimized_plan.json"
+    plan_file_path = "optimized_plan.json"
     with open(plan_file_path, "w") as f:
         f.write(raw_plan)
     print(f"   💾 Plan saved to: {plan_file_path}")
