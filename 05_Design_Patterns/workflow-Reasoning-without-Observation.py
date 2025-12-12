@@ -133,14 +133,6 @@ Do NOT execute tools. Do NOT output markdown code blocks. Just the raw JSON stri
 
 async def run_reasoning_without_observation_workflow(user_request: str):
     # 0. Initialize Client
-    api_key = os.getenv("OPENAI_API_KEY")
-    base_url = os.getenv("OPENAI_BASE_URL")
-    model_id = os.getenv("OPENAI_MODEL_ID")
-
-    if not api_key:
-        print("❌ Error: OPENAI_API_KEY not found in environment.")
-        return
-
     client = create_openaichat_client()
 
     # 1. Create Dummy Data
