@@ -1,10 +1,10 @@
 import asyncio
 import json
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 from agent_framework import (
-    BaseAgent,
     ChatAgent,
+    ChatMessage,
     ConcurrentBuilder,
     AgentRunUpdateEvent,
     WorkflowOutputEvent
@@ -130,25 +130,37 @@ async def run_optimizer_workflow(user_request: str):
         if not current_participants:
             continue
 
-        # 2. Build the Concurrent Workflow for this specific stage
-        # This maps to the pattern's concept of executing independent tasks simultaneously[cite: 31, 33].
-        concurrent_workflow = ConcurrentBuilder().participants(current_participants).build()
-
-        # 3. Run the stage
-        # We pass the accumulated context so subsequent stages know what happened previously.
         results_buffer = []
 
-        events = concurrent_workflow.run_stream(context_accumulator)
+        # 2. Check if we have multiple participants (use ConcurrentBuilder) or single (run directly)
+        if len(current_participants) >= 2:
+            # Build the Concurrent Workflow for this specific stage
+            # ConcurrentBuilder requires at least 2 participants
+            concurrent_workflow = ConcurrentBuilder().participants(current_participants).build()
 
-        async for event in events:
-            if isinstance(event, WorkflowOutputEvent):
-                # In a concurrent workflow, output might be a combined object or list.
-                # For this demo, we assume string or list of results.
-                print(f"   -> Finished: {event.data}")
-                results_buffer.append(str(event.data))
-            elif isinstance(event, AgentRunUpdateEvent):
-                # Optional: Print streaming tokens
-                pass
+            # 3. Run the stage with streaming
+            async for event in concurrent_workflow.run_stream(context_accumulator):
+                if isinstance(event, WorkflowOutputEvent):
+                    # Extract text from ChatMessage objects
+                    messages: list[ChatMessage] | Any = event.data
+                    for msg in messages:
+                        if hasattr(msg, 'author_name') and hasattr(msg, 'text'):
+                            author = msg.author_name if msg.author_name else "agent"
+                            print(f"   -> [{author}] Finished")
+                            results_buffer.append(f"[{author}]: {msg.text}")
+                elif isinstance(event, AgentRunUpdateEvent):
+                    # Optional: Print streaming tokens
+                    pass
+        else:
+            # Single agent: run directly without ConcurrentBuilder
+            agent = current_participants[0]
+            response = await agent.run(context_accumulator)
+
+            for msg in response.messages:
+                if hasattr(msg, 'author_name') and hasattr(msg, 'text'):
+                    author = msg.author_name if msg.author_name else stage[0]
+                    print(f"   -> [{author}] Finished")
+                    results_buffer.append(f"[{author}]: {msg.text}")
 
         # 4. Update Context for the next stage (Dependency Injection)
         # This ensures that if Stage 2 depends on Stage 1, it has the data.
