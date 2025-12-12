@@ -1,0 +1,21 @@
+{
+  "venue_reservation": {
+    "code": "CONF-VENUE-9988",
+    "location": "Grand Oak Conference Center, Room B",
+    "status": "Confirmed"
+  },
+  "attendee_data": {
+    "count": 15,
+    "departments": [
+      "Engineering",
+      "Product"
+    ],
+    "status": "All RSVP'd"
+  },
+  "catering_service": {
+    "provider": "Gourmet Bites Inc.",
+    "menu": "Mediterranean Buffet (Vegan/GF options included)",
+    "confirmation_message": "Order #CAT-554 received. Delivery at 11:30 AM.",
+    "total_cost": 1500.0
+  }
+}

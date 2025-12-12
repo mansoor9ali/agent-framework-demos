@@ -1,30 +1,30 @@
 {
-  "request_summary": "Launch a new line of spicy coffee beans with market insights and marketing strategy, followed by legal compliance check.",
+  "request_summary": "Launch a new line of spicy coffee beans, including market research, marketing messaging, and legal review.",
   "execution_stages": [
     {
       "stage_number": 1,
-      "stage_name": "Initial Research and Marketing Strategy",
-      "description": "Conduct market research on spicy coffee trends and develop marketing messaging.",
+      "stage_name": "Research and Marketing Development",
+      "description": "Gather market insights on the potential for spicy coffee beans and craft a compelling marketing message.",
       "agents": [
         {
           "agent_name": "researcher",
           "task": "Conduct market research",
           "sub_tasks": [
-            "Investigate current consumer trends in flavored coffee",
-            "Analyze competitive products in the spicy coffee segment",
-            "Identify potential market opportunities and risks associated with spicy coffee"
+            "Identify current trends in coffee flavor profiles",
+            "Analyze competitor offerings in the spicy coffee segment",
+            "Evaluate consumer feedback on spiced coffee products"
           ],
-          "expected_output": "Market report detailing current trends, competitive analysis, opportunities, and risks."
+          "expected_output": "Comprehensive report on market trends and consumer preferences for spicy coffee beans"
         },
         {
           "agent_name": "marketer",
-          "task": "Develop marketing messaging",
+          "task": "Develop a marketing strategy",
           "sub_tasks": [
-            "Create a catchy and appealing marketing blurb for the spicy coffee",
-            "Define the target demographic for the spicy coffee line",
-            "Develop value propositions highlighting the unique aspects of spicy coffee"
+            "Craft a catchy tagline and marketing blurb for spicy coffee beans",
+            "Define target demographic for the marketing campaign",
+            "Outline initial promotional strategies"
           ],
-          "expected_output": "A compelling marketing blurb and a defined target demographic profile with value propositions."
+          "expected_output": "Marketing blurb and target messaging strategy for the spicy coffee bean launch"
         }
       ],
       "dependencies": [],
@@ -33,16 +33,16 @@
     {
       "stage_number": 2,
       "stage_name": "Review Stage",
-      "description": "Legal review of previous outputs to ensure compliance with advertising laws and regulations.",
+      "description": "Legal review of marketing materials to ensure compliance with advertising laws and regulations.",
       "agents": [
         {
           "agent_name": "legal",
           "task": "Review and validate",
           "sub_tasks": [
-            "Review marketing claims for compliance with truth-in-advertising laws",
-            "Check for compliance with any health-related claims or warnings required"
+            "Review marketing claims for exaggeration or false claims",
+            "Check compliance with food advertising standards and regulations"
           ],
-          "expected_output": "Compliance report ensuring all marketing material meets legal standards."
+          "expected_output": "Compliance report highlighting any issues and recommendations"
         }
       ],
       "dependencies": ["stage_1"],
@@ -50,5 +50,5 @@
     }
   ],
   "total_stages": 2,
-  "optimization_notes": "This ordering allows for initial research and marketing to influence each other without delay, and ensures legal compliance before any launch phases, reducing risk of legal issues."
+  "optimization_notes": "Market research and marketing development run in parallel to quickly produce insights and creative output. Legal review follows to ensure compliance with all claims and advertising standards."
 }
