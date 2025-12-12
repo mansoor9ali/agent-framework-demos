@@ -9,6 +9,8 @@
 ## 1. Executive Summary
 The **Planner-Critic-Refiner** pattern is a robust architectural strategy designed to maximize the reliability and accuracy of Agentic AI solutions. It addresses the inherent fallibility of "single-pass" planning by establishing an iterative feedback loop between a planning agent and a critical review agent. This pattern ensures that complex, multi-step plans are thoroughly vetted and optimized before any execution takes place, making it ideal for high-stakes scenarios where errors must be minimized.
 
+![Planner-Critic-Refiner Pattern Architecture](Planner_Critic_Refiner_Pattern.jpg)
+
 ---
 
 ## 2. Problem Statement: The Single-Pass Flaw
