@@ -8,6 +8,8 @@
 ## 1. Executive Summary
 The **Language Agent Tree Search (LATS)** pattern is a sophisticated architectural strategy designed to overcome the limitations of linear reasoning in Agentic AI. By integrating Large Language Models (LLMs) with the **Monte Carlo Tree Search (MCTS)** algorithm, this pattern introduces deliberate exploration, self-correction, and multi-path evaluation. It allows an agent to simulate diverse hypothetical scenarios and select the optimal path before committing to a real-world action, significantly increasing decision-making robustness.
 
+![Language Agent Tree Search (LATS) Pattern Architecture](Language_Agent_Tree_Search_Pattern.jpg)
+
 ---
 
 ## 2. Problem Statement: The Linear Reasoning Trap
