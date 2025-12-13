@@ -1,5 +1,3 @@
-# Copyright (c) Microsoft. All rights reserved.
-# type: ignore
 import asyncio
 import math
 import os
