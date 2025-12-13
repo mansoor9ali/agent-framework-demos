@@ -1,4 +1,4 @@
-# Design Document: Second-Pass Verification Pattern
+# Design Document: Dynamic Self-Discover Second-Pass Verification Pattern
 
 **Version:** 1.0
 **Context:** Agentic AI Solution Design Patterns
