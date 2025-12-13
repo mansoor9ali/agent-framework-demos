@@ -7,10 +7,11 @@ import argparse
 import pandas as pd
 from typing import Any
 from dotenv import load_dotenv
-
+from utils import create_deepseek_client
 from agent_framework import ChatAgent, ChatMessage
-from agent_framework.openai import OpenAIChatClient
-from azure.ai.evaluation import GroundednessEvaluator, AzureOpenAIModelConfiguration
+
+from evaluation.impl.groundedness_evaluator import GroundednessEvaluator
+
 
 """
 Self-Reflection LLM Runner
@@ -198,12 +199,9 @@ async def run_self_reflection_batch(
         load_dotenv(override=True)
 
     # Create agent, it loads environment variables AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT automatically
-    agent = OpenAIChatClient(
-        api_key=os.getenv("DEEPSEEK_API_KEY"),
-        base_url=os.getenv("DEEPSEEK_BASE_URL"),
-        model_id=agent_model,
-    ).create_agent(
+    agent =  create_deepseek_client().create_agent(
         instructions="You are a helpful agent.",
+        model_id=agent_model,
     )
 
     # Load input data
