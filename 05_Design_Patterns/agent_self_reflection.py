@@ -1,16 +1,22 @@
 # Copyright (c) Microsoft. All rights reserved.
 # type: ignore
 import asyncio
+import math
 import os
+import sys
 import time
-import argparse
 import pandas as pd
-from typing import Any
+from typing import Any, Dict
+
+# Add parent directory to path for utils import
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from dotenv import load_dotenv
 from utils import create_deepseek_client
 from agent_framework import ChatAgent, ChatMessage
 
-from evaluation.impl.groundedness_evaluator import GroundednessEvaluator
+# Azure AI Evaluation SDK - using official Microsoft evaluators
+from azure.ai.evaluation import GroundednessEvaluator
 
 
 """
@@ -25,12 +31,14 @@ This module implements a self-reflection loop for LLM responses using groundedne
 It loads prompts from a JSONL file, runs them through an LLM with self-reflection,
 and saves the results.
 
+Now using Azure AI Evaluation SDK for groundedness evaluation:
+https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/evaluate-sdk
 
 Usage as CLI:
-    python self_reflection.py
+    python agent_self_reflection.py
 
 Usage as CLI with extra options:
-    python self_reflection.py --input resources/suboptimal_groundedness_prompts.jsonl \\
+    python agent_self_reflection.py --input resources/suboptimal_groundedness_prompts.jsonl \\
                               --output resources/results.jsonl \\
                               --max-reflections 3 \\
                               -n 10  # Optional: process only first 10 prompts
@@ -41,21 +49,39 @@ DEFAULT_AGENT_MODEL = os.getenv("DEEPSEEK_MODEL_ID")
 DEFAULT_JUDGE_MODEL = os.getenv("DEEPSEEK_MODEL_ID")
 
 
-def create_groundedness_evaluator(judge_model: str) -> GroundednessEvaluator:
+def create_evaluator_model_config(judge_model: str = None) -> Dict[str, Any]:
     """
-    Create a groundedness evaluator.
+    Create model configuration for Azure AI Evaluation SDK.
+
+    Per Microsoft docs: For AI-assisted quality evaluators, you must specify
+    a GPT model (gpt-4, gpt-4o, gpt-4o-mini) in your model_config.
+
+    For OpenAI (non-Azure), you need to specify type: "openai"
+
+    Args:
+        judge_model: Optional model name override
+    Returns:
+        Dictionary with model configuration
+    """
+    return {
+        "type": "openai",  # Required: specify connection type for OpenAI-compatible endpoints
+        "api_key": os.getenv("DEEPSEEK_API_KEY"),
+        "base_url": os.getenv("DEEPSEEK_BASE_URL"),
+        "model": judge_model or DEFAULT_JUDGE_MODEL,
+    }
+
+
+def create_groundedness_evaluator(judge_model: str = None) -> GroundednessEvaluator:
+    """
+    Create a groundedness evaluator using Azure AI Evaluation SDK.
 
     Args:
         judge_model: Model deployment name for evaluation
     Returns:
-        Configured GroundednessEvaluator
+        Configured GroundednessEvaluator from Azure AI Evaluation SDK
     """
-    judge_model_config = OpenAIChatClient(
-        api_key=os.getenv("DEEPSEEK_API_KEY"),
-        base_url=os.getenv("DEEPSEEK_BASE_URL"),
-        model_id=DEFAULT_JUDGE_MODEL,
-    )
-    return GroundednessEvaluator(model_config=judge_model_config)
+    model_config = create_evaluator_model_config(judge_model)
+    return GroundednessEvaluator(model_config=model_config)
 
 
 async def execute_query_with_self_reflection(
@@ -98,6 +124,7 @@ async def execute_query_with_self_reflection(
     total_groundedness_eval_time = 0.0
     start_time = time.time()
     iteration_scores = []  # Store all iteration scores in structured format
+    i = 0  # Initialize loop counter
 
     for i in range(max_self_reflections):
         print(f"  Self-reflection iteration {i + 1}/{max_self_reflections}...")
@@ -115,8 +142,15 @@ async def execute_query_with_self_reflection(
         end_time_eval = time.time()
         total_groundedness_eval_time += (end_time_eval - start_time_eval)
 
-        feedback = groundedness_res['groundedness_reason']
-        score = int(groundedness_res['groundedness'])
+        feedback = groundedness_res.get('groundedness_reason', 'No reason provided')
+        raw_score = groundedness_res.get('groundedness', 0)
+
+        # Handle NaN or invalid scores
+        if raw_score is None or (isinstance(raw_score, float) and math.isnan(raw_score)):
+            print(f"  ⚠️ Invalid score received (NaN), using 0")
+            score = 0
+        else:
+            score = int(raw_score)
 
         # Store score in structured format
         iteration_scores.append(score)
@@ -347,39 +381,55 @@ async def run_self_reflection_batch(
     print("=" * 60)
 
 
-async def main():
-    """CLI entry point."""
-    parser = argparse.ArgumentParser(description="Run self-reflection loop on LLM prompts with groundedness evaluation")
-    parser.add_argument('--input', '-i', default="resources/suboptimal_groundedness_prompts.jsonl",
-                        help='Input JSONL file with prompts')
-    parser.add_argument('--output', '-o', default="resources/results.jsonl", help='Output JSONL file for results')
-    parser.add_argument('--agent-model', '-m', default=DEFAULT_AGENT_MODEL,
-                        help=f'Agent model deployment name (default: {DEFAULT_AGENT_MODEL})')
-    parser.add_argument('--judge-model', '-e', default=DEFAULT_JUDGE_MODEL,
-                        help=f'Judge model deployment name (default: {DEFAULT_JUDGE_MODEL})')
-    parser.add_argument('--max-reflections', type=int, default=3,
-                        help='Maximum number of self-reflection iterations (default: 3)')
-    parser.add_argument('--env-file', help='Path to .env file with Azure OpenAI credentials')
-    parser.add_argument('--limit', '-n', type=int, default=None,
-                        help='Process only the first N prompts from the input file')
+# =============================================================================
+# CONFIGURATION - Fixed Values (No command-line arguments)
+# =============================================================================
 
-    args = parser.parse_args()
+# Input/Output paths
+INPUT_FILE = "resources/suboptimal_groundedness_prompts.jsonl"
+OUTPUT_FILE = "resources/results.jsonl"
+
+# Model configuration
+AGENT_MODEL = DEFAULT_AGENT_MODEL  # Uses DEEPSEEK_MODEL_ID from .env
+JUDGE_MODEL = DEFAULT_JUDGE_MODEL  # Uses DEEPSEEK_MODEL_ID from .env
+
+# Self-reflection settings
+MAX_REFLECTIONS = 3  # Maximum number of self-reflection iterations
+LIMIT = None  # Set to a number to process only first N prompts (e.g., 5), or None for all
+
+
+async def main():
+    """Main entry point with fixed configuration values."""
+    print("=" * 60)
+    print("🔄 Self-Reflection LLM Runner")
+    print("   Using Azure AI Evaluation SDK for Groundedness")
+    print("=" * 60)
+    print(f"\n📋 Configuration:")
+    print(f"   Input file:       {INPUT_FILE}")
+    print(f"   Output file:      {OUTPUT_FILE}")
+    print(f"   Agent model:      {AGENT_MODEL}")
+    print(f"   Judge model:      {JUDGE_MODEL}")
+    print(f"   Max reflections:  {MAX_REFLECTIONS}")
+    print(f"   Limit:            {LIMIT if LIMIT else 'All prompts'}")
+    print()
 
     # Run the batch processing
     try:
         await run_self_reflection_batch(
-            input_file=args.input,
-            output_file=args.output,
-            agent_model=args.agent_model,
-            judge_model=args.judge_model,
-            max_self_reflections=args.max_reflections,
-            env_file=args.env_file,
-            limit=args.limit
+            input_file=INPUT_FILE,
+            output_file=OUTPUT_FILE,
+            agent_model=AGENT_MODEL,
+            judge_model=JUDGE_MODEL,
+            max_self_reflections=MAX_REFLECTIONS,
+            env_file=None,
+            limit=LIMIT
         )
         print("\n✓ Processing complete!")
 
     except Exception as e:
         print(f"\n✗ Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return 1
     return 0
 
