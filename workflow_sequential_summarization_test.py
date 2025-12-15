@@ -11,8 +11,6 @@ from rich import print
 # Load environment variables from .env file
 load_dotenv()
 
-Sub task issue
-==================================
 
 client = OpenAIChatClient(
         api_key=os.getenv("OPENAI_API_KEY"),

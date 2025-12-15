@@ -4,7 +4,7 @@ import asyncio
 from random import randint
 from typing import Annotated
 from rich import print
-from utils import create_gptoss120b_client , create_foundrylocal_client
+from utils import create_openaichat_client , create_foundrylocal_client
 
 # Load environment variables from .env file
 
@@ -29,13 +29,13 @@ async def non_streaming_example() -> None:
     """Example of non-streaming response (get the complete result at once)."""
     print("=== Non-streaming Response Example ===")
 
-    agent = create_gptoss120b_client().create_agent(
+    agent = create_openaichat_client().create_agent(
         name="WeatherAgent",
         instructions="You are a helpful weather agent.",
         tools=get_weather,
     )
 
-    query = "What's the weather like in Seattle?"
+    query = "What's the weather like in New York?"
     print(f"User: {query}")
     result = await agent.run(query)
     print(f"Result: {result}\n")
@@ -45,13 +45,13 @@ async def streaming_example() -> None:
     """Example of streaming response (get results as they are generated)."""
     print("=== Streaming Response Example ===")
 
-    agent = create_gptoss120b_client().create_agent(
+    agent = create_openaichat_client().create_agent(
         name="WeatherAgent",
         instructions="You are a helpful weather agent.",
         tools=get_weather,
     )
 
-    query = "What's the weather like in Portland?"
+    query = "What's the weather like in Karachi?"
     print(f"User: {query}")
     print("Agent: ", end="", flush=True)
     async for chunk in agent.run_stream(query):

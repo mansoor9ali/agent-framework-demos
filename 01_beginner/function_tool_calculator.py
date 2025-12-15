@@ -7,11 +7,18 @@ The agent can perform mathematical calculations.
 
 import asyncio
 from typing import Annotated
+from typing import Callable, Awaitable
 
+from agent_framework import (
+    FunctionInvocationContext,
+    function_middleware
+)
+from dotenv import load_dotenv
 from pydantic import Field
 
-from utils import create_gptoss120b_client
+from utils import create_openaichat_client
 
+load_dotenv()
 
 # Define calculator function
 def calculate(
@@ -30,11 +37,34 @@ def calculate(
                 "max": max,
                 "sum": sum,
                 "pow": pow,
+                "sqrt": lambda x: x ** 0.5,
             }
         )
         return f"Result: {result}"
     except Exception as e:
         return f"Error: Could not calculate '{expression}'"
+
+
+# ============================================================================
+# MIDDLEWARE 3: FUNCTION LOGGER (Function Middleware)
+# ============================================================================
+
+@function_middleware
+async def function_logger_middleware(
+        context: FunctionInvocationContext,
+        next: Callable[[FunctionInvocationContext], Awaitable[None]],
+) -> None:
+    """Logs every function/tool call with arguments and results."""
+
+    print(f"\n🔧 [FUNCTION] Calling tool: {context.function.name}")
+    print(f"🔧 [FUNCTION] Arguments: {context.arguments}")
+
+    # Execute the function
+    await next(context)
+
+    # Log the result
+    print(f"🔧 [FUNCTION] Result: {context.result}")
+
 
 
 async def main():
@@ -45,10 +75,13 @@ async def main():
     print("="*70)
     
     # Create agent with calculator tool
-    agent = create_gptoss120b_client().create_agent(
-        instructions="You are a math assistant. Use the calculate tool for math problems.",
+    agent = create_openaichat_client().create_agent(
+        instructions="You are a math assistant. Use the calculate tool for math problems. Only give answers related to calculations. otherwise, respond with 'I can only help with math calculations.'",
         name="CalculatorBot",
-        tools=[calculate]
+        tools=[calculate],
+        middleware=[
+            function_logger_middleware,  # Function middleware
+        ]
     )
     
     print("\n✅ Agent created with calculator tool")
