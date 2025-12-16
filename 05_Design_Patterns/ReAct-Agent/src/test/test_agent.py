@@ -5,7 +5,7 @@ import sys
 import os
 
 # Add project root to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../..'))
 
 from src.react.agent import run
 from src.config.logging import logger
@@ -27,11 +27,11 @@ def test_agent():
     print("=" * 80)
     print(f"Model: {model_id}")
     print(f"Base URL: {base_url}")
-    print(f"API Key: {'✓ Configured' if api_key else '✗ Missing'}")
+    print(f"API Key: {'[OK] Configured' if api_key else '[X] Missing'}")
     print("=" * 80)
 
     if not api_key:
-        print("\n❌ ERROR: DEEPSEEK_API_KEY not found in environment variables!")
+        print("\n[X] ERROR: DEEPSEEK_API_KEY not found in environment variables!")
         print("Please ensure your .env file has the required variables.")
         return
 
@@ -48,9 +48,9 @@ def test_agent():
 
         try:
             answer = run(query)
-            print(f"\n✅ Answer: {answer}")
+            print(f"\n[OK] Answer: {answer}")
         except Exception as e:
-            print(f"\n❌ Error: {str(e)}")
+            print(f"\n[ERROR] Error: {str(e)}")
             logger.error(f"Test {i} failed: {e}")
 
     print(f"\n{'='*80}")
