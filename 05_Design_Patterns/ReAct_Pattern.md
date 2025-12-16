@@ -8,6 +8,8 @@
 ## 1. Executive Summary
 The **ReAct (Reasoning + Acting)** pattern is a foundational architectural strategy for Agentic AI that synergizes reasoning and action in an iterative loop. By combining Chain-of-Thought (CoT) reasoning with tool-based action execution, this pattern enables agents to dynamically interact with their environment, observe outcomes, and adjust their strategy in real-time. ReAct is the baseline pattern for building adaptive, interactive AI agents capable of solving complex, multi-step problems through continuous feedback.
 
+
+![ReAct Pattern Architecture](ReAct_Pattern.png)
 ---
 
 ## 2. Problem Statement: The Static Reasoning Limitation
@@ -71,65 +73,7 @@ Manages tool execution and observation handling.
 * Invoke appropriate tools
 * Capture and format tool outputs
 * Handle errors and edge cases
-
-### 4.2 Data Flow Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        User Query                            │
-└─────────────────────┬───────────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Agent (Orchestrator)                      │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │         Iteration Loop (max 5-10 cycles)             │   │
-│  │                                                      │   │
-│  │  ┌─────────────────────────────────────────────┐   │   │
-│  │  │  1. THINK (Reasoning Module + LLM)          │   │   │
-│  │  │     - Analyze current state                 │   │   │
-│  │  │     - Review conversation history           │   │   │
-│  │  │     - Decide next action or final answer    │   │   │
-│  │  │     Output: JSON {thought, action/answer}   │   │   │
-│  │  └──────────────┬──────────────────────────────┘   │   │
-│  │                 │                                   │   │
-│  │                 ▼                                   │   │
-│  │  ┌─────────────────────────────────────────────┐   │   │
-│  │  │  2. DECIDE (Controller)                     │   │   │
-│  │  │     - Parse LLM output                      │   │   │
-│  │  │     - Route to action or final answer       │   │   │
-│  │  └──────────────┬──────────────────────────────┘   │   │
-│  │                 │                                   │   │
-│  │                 ▼                                   │   │
-│  │  ┌─────────────────────────────────────────────┐   │   │
-│  │  │  3. ACT (Tool Execution)                    │   │   │
-│  │  │     - Execute selected tool                 │   │   │
-│  │  │     - Handle tool errors                    │   │   │
-│  │  └──────────────┬──────────────────────────────┘   │   │
-│  │                 │                                   │   │
-│  │                 ▼                                   │   │
-│  │  ┌─────────────────────────────────────────────┐   │   │
-│  │  │  4. OBSERVE (Feedback Loop)                 │   │   │
-│  │  │     - Capture tool output                   │   │   │
-│  │  │     - Add observation to history            │   │   │
-│  │  │     - Continue to next iteration            │   │   │
-│  │  └──────────────┬──────────────────────────────┘   │   │
-│  │                 │                                   │   │
-│  │                 └───────────────┐                   │   │
-│  │                                 │                   │   │
-│  └─────────────────────────────────┼───────────────────┘   │
-│                                    │                       │
-│                    ┌───────────────┘                       │
-│                    │                                       │
-│                    ▼                                       │
-│         Check: Final Answer or Continue Loop?             │
-└────────────────────┬──────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      Final Answer                            │
-└─────────────────────────────────────────────────────────────┘
-```
+ 
 
 ---
 
