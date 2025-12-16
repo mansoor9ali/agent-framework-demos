@@ -6,7 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
-# credentials 
+# Logging
+app.log
+logs/
+
+# credentials
 credentials
 credentials/
 

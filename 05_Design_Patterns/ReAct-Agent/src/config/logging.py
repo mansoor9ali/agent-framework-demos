@@ -19,13 +19,14 @@ class CustomLogRecord(logging.LogRecord):
         self.pathname = custom_path_filter(self.pathname)
 
 
-def setup_logger(log_filename="app.log", log_dir="logs"):
-    # Ensure the logging directory exists
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+def setup_logger(log_filename="app.log"):
+    # Get the ReAct-Agent root directory (3 levels up from this file)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.join(current_dir, "..", "..")
+    project_root = os.path.abspath(project_root)
 
-    # Define the log file path
-    log_filepath = os.path.join(log_dir, log_filename)
+    # Define the log file path in the project root
+    log_filepath = os.path.join(project_root, log_filename)
 
     # Define the logging configuration
     logging.setLogRecordFactory(CustomLogRecord)
@@ -34,7 +35,7 @@ def setup_logger(log_filename="app.log", log_dir="logs"):
         format="%(asctime)s [%(levelname)s] [%(module)s] [%(pathname)s]: %(message)s",
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler(log_filepath)
+            logging.FileHandler(log_filepath, mode='a')
         ]
     )
 
