@@ -19,6 +19,9 @@ from datetime import datetime
 
 # Agent Framework imports for creating agents and MCP integration
 from agent_framework import ChatAgent, MCPStreamableHTTPTool
+from fastmcp.server.middleware import Middleware
+
+from opentelemetry_middleware import OpenTelemetryMiddleware, configure_aspire_dashboard
 from utils import create_openaichat_client  # Helper to create OpenAI chat client
 from middleware import function_logger_middleware  # Shared middleware for logging tool calls
 from dotenv import load_dotenv
@@ -29,10 +32,15 @@ from rich.logging import RichHandler  # Beautiful logging output
 # ============================================================================
 # Configure logging with Rich for better console output
 # Base level is WARNING, but we override the logger to INFO for our messages
-logging.basicConfig(level=logging.WARNING, format="%(message)s", datefmt="[%X]", handlers=[RichHandler()])
-logger = logging.getLogger("agentframework_mcp_http")
-logger.setLevel(logging.INFO)  # Show INFO level messages for this logger
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(message)s")
+logger = logging.getLogger("ExpensesMCP")
+logger.setLevel(logging.INFO)
 
+middleware: list[Middleware] = []
+if os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"):
+    logger.info("Setting up Aspire Dashboard instrumentation (OTLP)")
+    configure_aspire_dashboard(service_name="expenses-mcp")
+    middleware = [OpenTelemetryMiddleware(tracer_name="expenses.mcp")]
 # ============================================================================
 # ENVIRONMENT CONFIGURATION
 # ============================================================================
@@ -95,7 +103,7 @@ async def http_mcp_example() -> None:
         ) as agent,
     ):
         # Define the user's expense entry in natural language
-        user_query = "yesterday I bought a laptop for $1200 using my visa."
+        user_query = "yesterday I bought a IPhone for $1432 using my amex."
 
         # Run the agent with the query, providing access to MCP tools
         # The agent will:

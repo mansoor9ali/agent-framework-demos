@@ -1,0 +1,28 @@
+docker run -d --name aspire-dashboard -p 18888:18888 -p 4317:18889 -e DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true mcr.microsoft.com/dotnet/aspire-dashboard:9.1
+
+
+docker run -d \
+  --name aspire-dashboard \
+  -p 18888:18888 \
+  -p 4317:18889 \
+  -e DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true \
+  mcr.microsoft.com/dotnet/aspire-dashboard:9.1
+
+
+version: '3.8'
+
+services:
+  aspire-dashboard:
+    container_name: aspire-dashboard
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.1
+    ports:
+      - "18888:18888"
+      - "4317:18889"
+    environment:
+      - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
+    restart: unless-stopped
+
+
+Dashboard URL: http://localhost:18888
+OTLP Endpoint: http://localhost:4317
+Port Mappings Explained
