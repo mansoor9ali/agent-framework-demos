@@ -14,6 +14,7 @@ Key Concepts:
 """
 
 import asyncio
+import csv
 import logging
 import os
 import sys
@@ -21,6 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
+from rich.console import Console
 from rich.logging import RichHandler
 
 # Agent Framework imports for creating agents and MCP integration
@@ -42,6 +44,9 @@ logging.basicConfig(
 logger = logging.getLogger("agentframework_mcp_stdio")
 logger.setLevel(logging.INFO)
 
+# Rich console for pretty output
+console = Console()
+
 # ============================================================================
 # ENVIRONMENT CONFIGURATION
 # ============================================================================
@@ -54,6 +59,38 @@ if not RUNNING_IN_PRODUCTION:
 SCRIPT_DIR = Path(__file__).parent.parent
 MCP_SERVER_PATH = SCRIPT_DIR / "mcp_servers" / "basic_mcp_stdio.py"
 PYTHON_EXECUTABLE = sys.executable
+
+# CSV output file for storing expense logs
+CSV_OUTPUT_FILE = Path(__file__).parent / "expense_logs.csv"
+
+# ============================================================================
+# HELPER FUNCTIONS
+# ============================================================================
+
+def save_expense_to_csv(query: str, response: str, csv_file: Path) -> None:
+    """
+    Save expense query and response to CSV file.
+
+    Args:
+        query: The user's expense query
+        response: The agent's response
+        csv_file: Path to the CSV file
+    """
+    file_exists = csv_file.exists()
+
+    with open(csv_file, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+
+        # Write header if file is new
+        if not file_exists:
+            writer.writerow(['Timestamp', 'Query', 'Response'])
+
+        # Write data
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        writer.writerow([timestamp, query, response])
+
+    console.print(f"[bold green]💾 Expense log saved to:[/bold green] {csv_file}")
+
 
 # ============================================================================
 # MAIN AGENT LOGIC
@@ -98,6 +135,9 @@ async def stdio_mcp_example() -> None:
 
         # Display the final response
         logger.info(f"\n📝 [RESPONSE] {result}")
+
+        # Save expense log to CSV file
+        save_expense_to_csv(user_query, str(result), CSV_OUTPUT_FILE)
 
         # Keep the worker alive in production mode
         while RUNNING_IN_PRODUCTION:
