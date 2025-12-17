@@ -54,7 +54,7 @@ if not RUNNING_IN_PRODUCTION:
 
 # MCP server URL - defaults to localhost for local development
 # In production, this should point to the deployed MCP server
-MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8000/mcp/")
+MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8004/mcp/")
 
 # API host configuration (for future use)
 API_HOST = os.getenv("API_HOST", "github")

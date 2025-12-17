@@ -29,7 +29,7 @@ SCRIPT_DIR = Path(__file__).parent
 EXPENSES_FILE = SCRIPT_DIR / "expenses.csv"
 
 
-mcp = FastMCP("Expenses Tracker")
+mcp = FastMCP("Expenses Tracker", middleware=middleware)
 
 
 class PaymentMethod(Enum):
@@ -142,4 +142,4 @@ def analyze_spending_prompt(
 
 if __name__ == "__main__":
     logger.info("MCP Expenses server starting (HTTP mode on port 8000)")
-    mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=8004)

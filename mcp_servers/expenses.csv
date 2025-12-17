@@ -25,3 +25,4 @@ date,amount,category,description,payment_method
 2025-12-15,1200.0,gadget,Laptop purchase,visa
 2025-12-15,12.0,shopping,Bought a book,amex
 2025-12-15,1432.0,gadget,Bought an iPhone,amex
+2025-12-16,1432.0,gadget,IPhone purchase,amex
