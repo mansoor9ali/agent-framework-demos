@@ -16,7 +16,7 @@ from agent_framework import (
 from dotenv import load_dotenv
 from pydantic import Field
 
-from utils import create_openaichat_client
+from utils import create_dotted_client
 
 load_dotenv()
 
@@ -75,7 +75,7 @@ async def main():
     print("="*70)
     
     # Create agent with calculator tool
-    agent = create_openaichat_client().create_agent(
+    agent = create_dotted_client().create_agent(
         instructions="You are a math assistant. Use the calculate tool for math problems. Only give answers related to calculations. otherwise, respond with 'I can only help with math calculations.'",
         name="CalculatorBot",
         tools=[calculate],
