@@ -15,8 +15,9 @@ from agent_framework import (
     WorkflowOutputEvent,
     executor,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 """
 Sample: Two agents connected by a function executor bridge
@@ -87,7 +88,7 @@ async def enrich_with_references(
 
 
 def create_research_agent():
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         name="research_agent",
         instructions=(
             "Produce a short, bullet-style briefing with two actionable ideas. Label the section as 'Initial Draft'."
@@ -96,7 +97,7 @@ def create_research_agent():
 
 
 def create_final_editor_agent():
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         name="final_editor_agent",
         instructions=(
             "Use all conversation context (including external notes) to produce the final answer. "

@@ -3,9 +3,9 @@
 import asyncio
 
 from agent_framework import AgentRunUpdateEvent, WorkflowBuilder, WorkflowOutputEvent
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
 
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 """
 Sample: Agents in a workflow with streaming
 
@@ -27,7 +27,7 @@ Prerequisites:
 
 
 def create_writer_agent():
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         instructions=(
             "You are an excellent content writer. You create new content and edit contents based on the feedback."
         ),
@@ -36,7 +36,7 @@ def create_writer_agent():
 
 
 def create_reviewer_agent():
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         instructions=(
             "You are an excellent content reviewer."
             "Provide actionable feedback to the writer about the provided content."

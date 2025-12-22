@@ -3,8 +3,9 @@
 import asyncio
 
 from agent_framework import AgentRunUpdateEvent, ChatAgent, WorkflowBuilder, WorkflowOutputEvent
-from agent_framework.azure import AzureAIAgentClient
-from azure.identity.aio import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 """
 Sample: Agents in a workflow with streaming
@@ -26,7 +27,7 @@ Prerequisites:
 """
 
 
-def create_writer_agent(client: AzureAIAgentClient) -> ChatAgent:
+def create_writer_agent(client: OpenAIChatClient) -> ChatAgent:
     return client.create_agent(
         name="Writer",
         instructions=(
@@ -35,7 +36,7 @@ def create_writer_agent(client: AzureAIAgentClient) -> ChatAgent:
     )
 
 
-def create_reviewer_agent(client: AzureAIAgentClient) -> ChatAgent:
+def create_reviewer_agent(client: OpenAIChatClient) -> ChatAgent:
     return client.create_agent(
         name="Reviewer",
         instructions=(
@@ -47,33 +48,33 @@ def create_reviewer_agent(client: AzureAIAgentClient) -> ChatAgent:
 
 
 async def main() -> None:
-    async with AzureCliCredential() as cred, AzureAIAgentClient(async_credential=cred) as client:
-        # Build the workflow by adding agents directly as edges.
-        # Agents adapt to workflow mode: run_stream() for incremental updates, run() for complete responses.
-        workflow = (
-            WorkflowBuilder()
-            .register_agent(lambda: create_writer_agent(client), name="writer")
-            .register_agent(lambda: create_reviewer_agent(client), name="reviewer", output_response=True)
-            .set_start_executor("writer")
-            .add_edge("writer", "reviewer")
-            .build()
-        )
+    client = create_dotted_client()
+    # Build the workflow by adding agents directly as edges.
+    # Agents adapt to workflow mode: run_stream() for incremental updates, run() for complete responses.
+    workflow = (
+        WorkflowBuilder()
+        .register_agent(lambda: create_writer_agent(client), name="writer")
+        .register_agent(lambda: create_reviewer_agent(client), name="reviewer", output_response=True)
+        .set_start_executor("writer")
+        .add_edge("writer", "reviewer")
+        .build()
+    )
 
-        last_executor_id: str | None = None
+    last_executor_id: str | None = None
 
-        events = workflow.run_stream("Create a slogan for a new electric SUV that is affordable and fun to drive.")
-        async for event in events:
-            if isinstance(event, AgentRunUpdateEvent):
-                eid = event.executor_id
-                if eid != last_executor_id:
-                    if last_executor_id is not None:
-                        print()
-                    print(f"{eid}:", end=" ", flush=True)
-                    last_executor_id = eid
-                print(event.data, end="", flush=True)
-            elif isinstance(event, WorkflowOutputEvent):
-                print("\n===== Final output =====")
-                print(event.data)
+    events = workflow.run_stream("Create a slogan for a new electric SUV that is affordable and fun to drive.")
+    async for event in events:
+        if isinstance(event, AgentRunUpdateEvent):
+            eid = event.executor_id
+            if eid != last_executor_id:
+                if last_executor_id is not None:
+                    print()
+                print(f"{eid}:", end=" ", flush=True)
+                last_executor_id = eid
+            print(event.data, end="", flush=True)
+        elif isinstance(event, WorkflowOutputEvent):
+            print("\n===== Final output =====")
+            print(event.data)
 
 
 if __name__ == "__main__":
