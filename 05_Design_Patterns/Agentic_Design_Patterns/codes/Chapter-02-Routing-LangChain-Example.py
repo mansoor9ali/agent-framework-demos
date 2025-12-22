@@ -3,7 +3,8 @@
 # This code is licensed under the MIT License.
 # See the LICENSE file in the repository for the full license text.
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+import os
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableBranch
@@ -11,14 +12,25 @@ from langchain_core.runnables import RunnablePassthrough, RunnableBranch
 # Colab 代码链接: https://colab.research.google.com/drive/1Yh3eUcvajJfgTFKhEQga6bJ3yyKodAmg
 
 # 安装依赖
-# pip install langchain langgraph google-cloud-aiplatform langchain-google-genai google-adk deprecated pydantic
+# pip install langchain langchain-community langchain-openai langgraph
+
+# For better security, load environment variables from a .env file
+# 为了更好的安全性，建议从 .env 文件加载环境变量
+from dotenv import load_dotenv
+load_dotenv()
+# Make sure your OPENAI_API_KEY is set in the .env file
+# 确保你的 OPENAI_API_KEY 已在 .env 文件中设置
 
 # --- Configuration ---
-# Ensure your API key environment variable is set (e.g., GOOGLE_API_KEY)
-# 确保你的 API 密钥环境变量已设置 (如 GOOGLE_API_KEY)
+# Initialize the Language Model (using ChatOpenAI with DeepSeek configuration)
+# 初始化语言模型（使用 ChatOpenAI 配置 DeepSeek）
 try:
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
-    print(f"Language model initialized: {llm.model}")
+    llm = ChatOpenAI(
+        api_key=os.getenv("deepseek_api_key"),
+        model=os.getenv("deepseek_model_id"),
+        base_url=os.getenv("deepseek_base_url"),
+        temperature=0)
+    print(f"Language model initialized: {llm.model_name}")
 except Exception as e:
     print(f"Error initializing language model: {e}")
     llm = None
