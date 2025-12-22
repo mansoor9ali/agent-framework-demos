@@ -14,8 +14,9 @@ from agent_framework import (
     Role,
     WorkflowAgent,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
+
 
 """
 Sample: Handoff Workflow as Agent with Human-in-the-Loop
@@ -48,7 +49,7 @@ Prerequisites:
 """
 
 
-def create_agents(chat_client: AzureOpenAIChatClient) -> tuple[ChatAgent, ChatAgent, ChatAgent, ChatAgent]:
+def create_agents(chat_client: OpenAIChatClient) -> tuple[ChatAgent, ChatAgent, ChatAgent, ChatAgent]:
     """Create and configure the triage and specialist agents.
 
     The triage agent dispatches requests to the appropriate specialist.
@@ -156,7 +157,7 @@ async def main() -> None:
     print("=" * 55)
 
     # Initialize the Azure OpenAI chat client
-    chat_client = AzureOpenAIChatClient(credential=AzureCliCredential())
+    chat_client = create_openaichat_client()
 
     # Create agents
     triage, refund, order, support = create_agents(chat_client)
@@ -168,8 +169,8 @@ async def main() -> None:
             name="customer_support_handoff",
             participants=[triage, refund, order, support],
         )
-        .set_coordinator("triage_agent")
-        .with_termination_condition(lambda conv: sum(1 for msg in conv if msg.role.value == "user") >= 4)
+        .set_coordinator("")
+    .with_termination_condition(lambda conv: sum(1 for msg in conv if msg.role.value == "user") >= 4)
         .build()
         .as_agent()  # Convert workflow to agent interface
     )

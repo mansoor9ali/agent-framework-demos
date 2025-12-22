@@ -7,8 +7,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 # Ensure local getting_started package can be imported when running as a script.
 _SAMPLES_ROOT = Path(__file__).resolve().parents[3]
@@ -27,7 +28,7 @@ from agent_framework import (  # noqa: E402
     handler,
     response_handler,
 )
-from getting_started.workflows.agents.workflow_as_agent_reflection_pattern import (  # noqa: E402
+from workflow_as_agent_reflection_pattern import (  # noqa: E402
     ReviewRequest,
     ReviewResponse,
     Worker,
@@ -105,7 +106,7 @@ async def main() -> None:
         .register_executor(
             lambda: Worker(
                 id="sub-worker",
-                chat_client=AzureOpenAIChatClient(credential=AzureCliCredential()),
+                chat_client= create_dotted_client(),
             ),
             name="worker",
         )

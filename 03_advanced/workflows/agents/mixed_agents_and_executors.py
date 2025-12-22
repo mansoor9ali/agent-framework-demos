@@ -12,8 +12,9 @@ from agent_framework import (
     WorkflowContext,
     handler,
 )
-from agent_framework.azure import AzureAIAgentClient
-from azure.identity.aio import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 """
 This sample demonstrates how to create a workflow that combines an AI agent executor
@@ -71,7 +72,7 @@ class Evaluator(Executor):
         await ctx.yield_output(f"Correctness: {correctness}, Consumption: {consumption}")
 
 
-def create_coding_agent(client: AzureAIAgentClient) -> ChatAgent:
+def create_coding_agent(client: OpenAIChatClient) -> ChatAgent:
     """Create an AI agent with code interpretation capabilities.
 
     This agent can generate and execute Python code to solve problems.
@@ -90,10 +91,7 @@ def create_coding_agent(client: AzureAIAgentClient) -> ChatAgent:
 
 
 async def main():
-    async with (
-        AzureCliCredential() as credential,
-        AzureAIAgentClient(credential=credential) as chat_client,
-    ):
+        chat_client = create_openaichat_client()
         # Build a workflow: Agent generates code -> Evaluator assesses results
         # The agent will be wrapped in a special agent executor which produces AgentExecutorResponse
         workflow = (

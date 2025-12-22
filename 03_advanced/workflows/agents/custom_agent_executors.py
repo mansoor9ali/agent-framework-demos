@@ -10,8 +10,9 @@ from agent_framework import (
     WorkflowContext,
     handler,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 """
 Step 2: Agents in a Workflow non-streaming
@@ -43,7 +44,7 @@ class Writer(Executor):
 
     def __init__(self, id: str = "writer"):
         # Create a domain specific agent using your configured AzureOpenAIChatClient.
-        self.agent = AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+        self.agent = create_dotted_client().create_agent(
             instructions=(
                 "You are an excellent content writer. You create new content and edit contents based on the feedback."
             ),
@@ -85,7 +86,7 @@ class Reviewer(Executor):
 
     def __init__(self, id: str = "reviewer"):
         # Create a domain specific agent that evaluates and refines content.
-        self.agent = AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+        self.agent = create_dotted_client().create_agent(
             instructions=(
                 "You are an excellent content reviewer. You review the content and provide feedback to the writer."
             ),

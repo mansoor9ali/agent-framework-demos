@@ -10,7 +10,9 @@ from agent_framework import (
     HostedCodeInterpreterTool,
     MagenticBuilder,
 )
-from agent_framework.openai import OpenAIChatClient, OpenAIResponsesClient
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -44,7 +46,7 @@ async def main() -> None:
         name="CoderAgent",
         description="A helpful assistant that writes and executes code to process and analyze data.",
         instructions="You solve questions using code. Please provide detailed analysis and computation process.",
-        chat_client=OpenAIResponsesClient(),
+        chat_client=create_dotted_client(),
         tools=HostedCodeInterpreterTool(),
     )
 
@@ -53,7 +55,7 @@ async def main() -> None:
         name="MagenticManager",
         description="Orchestrator that coordinates the research and coding workflow",
         instructions="You coordinate a team to complete complex tasks efficiently.",
-        chat_client=OpenAIChatClient(),
+        chat_client=create_dotted_client(),
     )
 
     print("\nBuilding Magentic Workflow...")

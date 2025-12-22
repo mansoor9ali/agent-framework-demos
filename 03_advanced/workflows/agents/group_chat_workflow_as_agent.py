@@ -4,7 +4,9 @@ import asyncio
 import logging
 
 from agent_framework import ChatAgent, GroupChatBuilder
-from agent_framework.openai import OpenAIChatClient, OpenAIResponsesClient
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 logging.basicConfig(level=logging.INFO)
 
@@ -33,12 +35,12 @@ async def main() -> None:
         name="Writer",
         description="Synthesizes a polished answer using the gathered notes.",
         instructions="Compose clear and structured answers using any notes provided.",
-        chat_client=OpenAIResponsesClient(),
+        chat_client=create_dotted_client(),
     )
 
     workflow = (
         GroupChatBuilder()
-        .set_manager(manager=OpenAIChatClient().create_agent(), display_name="Coordinator")
+        .set_manager(manager=create_dotted_client().create_agent(), display_name="Coordinator")
         .participants(researcher=researcher, writer=writer)
         .build()
     )

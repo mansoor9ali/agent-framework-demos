@@ -3,8 +3,9 @@
 import asyncio
 
 from agent_framework import Role, SequentialBuilder
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 """
 Sample: Build a sequential workflow orchestration and wrap it as an agent.
@@ -27,7 +28,7 @@ Prerequisites:
 
 async def main() -> None:
     # 1) Create agents
-    chat_client = AzureOpenAIChatClient(credential=AzureCliCredential())
+    chat_client = create_dotted_client()
 
     writer = chat_client.create_agent(
         instructions=("You are a concise copywriter. Provide a single, punchy marketing sentence based on the prompt."),
