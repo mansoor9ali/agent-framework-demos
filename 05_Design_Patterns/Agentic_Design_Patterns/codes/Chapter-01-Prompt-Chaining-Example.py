@@ -17,7 +17,11 @@ load_dotenv()
 
 # Initialize the Language Model (using ChatOpenAI is recommended)
 # 初始化语言模型（推荐使用 ChatOpenAI）
-llm = ChatOpenAI(temperature=0)
+llm = ChatOpenAI(
+        api_key=os.getenv("deepseek_api_key"),
+        model=os.getenv("deepseek_model_id"),
+        base_url=os.getenv("deepseek_base_url"),
+        temperature=0)
 
 # --- Prompt 1: Extract Information ---
 # --- 提示 1: 提取信息 ---
