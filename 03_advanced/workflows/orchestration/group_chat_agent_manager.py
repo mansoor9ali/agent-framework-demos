@@ -12,8 +12,9 @@ from agent_framework import (
     Role,
     WorkflowOutputEvent,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 logging.basicConfig(level=logging.INFO)
 
@@ -30,8 +31,8 @@ Prerequisites:
 """
 
 
-def _get_chat_client() -> AzureOpenAIChatClient:
-    return AzureOpenAIChatClient(credential=AzureCliCredential())
+def _get_chat_client() -> OpenAIChatClient:
+    return create_dotted_client()
 
 
 async def main() -> None:

@@ -13,8 +13,9 @@ from agent_framework import (
     WorkflowContext,
     handler,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 """
 Sample: Concurrent Orchestration with Custom Agent Executors
@@ -39,7 +40,7 @@ Prerequisites:
 class ResearcherExec(Executor):
     agent: ChatAgent
 
-    def __init__(self, chat_client: AzureOpenAIChatClient, id: str = "researcher"):
+    def __init__(self, chat_client: OpenAIChatClient, id: str = "researcher"):
         self.agent = chat_client.create_agent(
             instructions=(
                 "You're an expert market and product researcher. Given a prompt, provide concise, factual insights,"
@@ -59,7 +60,7 @@ class ResearcherExec(Executor):
 class MarketerExec(Executor):
     agent: ChatAgent
 
-    def __init__(self, chat_client: AzureOpenAIChatClient, id: str = "marketer"):
+    def __init__(self, chat_client: OpenAIChatClient, id: str = "marketer"):
         self.agent = chat_client.create_agent(
             instructions=(
                 "You're a creative marketing strategist. Craft compelling value propositions and target messaging"
@@ -79,7 +80,7 @@ class MarketerExec(Executor):
 class LegalExec(Executor):
     agent: ChatAgent
 
-    def __init__(self, chat_client: AzureOpenAIChatClient, id: str = "legal"):
+    def __init__(self, chat_client: OpenAIChatClient, id: str = "legal"):
         self.agent = chat_client.create_agent(
             instructions=(
                 "You're a cautious legal/compliance reviewer. Highlight constraints, disclaimers, and policy concerns"
@@ -97,7 +98,7 @@ class LegalExec(Executor):
 
 
 async def main() -> None:
-    chat_client = AzureOpenAIChatClient(credential=AzureCliCredential())
+    chat_client = create_dotted_client()
 
     researcher = ResearcherExec(chat_client)
     marketer = MarketerExec(chat_client)

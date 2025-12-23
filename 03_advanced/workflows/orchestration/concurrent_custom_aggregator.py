@@ -4,8 +4,9 @@ import asyncio
 from typing import Any
 
 from agent_framework import ChatMessage, ConcurrentBuilder, Role
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 """
 Sample: Concurrent Orchestration with Custom Aggregator
@@ -28,7 +29,7 @@ Prerequisites:
 
 
 async def main() -> None:
-    chat_client = AzureOpenAIChatClient(credential=AzureCliCredential())
+    chat_client = create_dotted_client()
 
     researcher = chat_client.create_agent(
         instructions=(

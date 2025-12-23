@@ -13,8 +13,10 @@ from agent_framework import (
     WorkflowContext,
     handler,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 
 """
 Sample: Concurrent Orchestration with participant factories and Custom Aggregator
@@ -46,7 +48,7 @@ Prerequisites:
 
 def create_researcher() -> ChatAgent:
     """Factory function to create a researcher agent instance."""
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         instructions=(
             "You're an expert market and product researcher. Given a prompt, provide concise, factual insights,"
             " opportunities, and risks."
@@ -57,7 +59,7 @@ def create_researcher() -> ChatAgent:
 
 def create_marketer() -> ChatAgent:
     """Factory function to create a marketer agent instance."""
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         instructions=(
             "You're a creative marketing strategist. Craft compelling value propositions and target messaging"
             " aligned to the prompt."
@@ -68,7 +70,7 @@ def create_marketer() -> ChatAgent:
 
 def create_legal() -> ChatAgent:
     """Factory function to create a legal/compliance agent instance."""
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         instructions=(
             "You're a cautious legal/compliance reviewer. Highlight constraints, disclaimers, and policy concerns"
             " based on the prompt."
@@ -82,7 +84,7 @@ class SummarizationExecutor(Executor):
 
     def __init__(self) -> None:
         super().__init__(id="summarization_executor")
-        self.chat_client = AzureOpenAIChatClient(credential=AzureCliCredential())
+        self.chat_client = create_dotted_client()
 
     @handler
     async def summarize_results(self, results: list[Any], ctx: WorkflowContext[Never, str]) -> None:

@@ -3,8 +3,10 @@
 import asyncio
 
 from agent_framework import AgentThread, ChatAgent, ChatMessageStore, SequentialBuilder
+
 from agent_framework.openai import OpenAIChatClient
 
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 """
 Sample: Workflow as Agent with Thread Conversation History and Checkpointing
 
@@ -36,7 +38,7 @@ Prerequisites:
 
 async def main() -> None:
     # Create a chat client
-    chat_client = OpenAIChatClient()
+    chat_client = create_dotted_client()
 
     # Define factory functions for workflow participants
     def create_assistant() -> ChatAgent:
@@ -121,7 +123,7 @@ async def demonstrate_thread_serialization() -> None:
     This shows how conversation history can be persisted and restored,
     enabling long-running conversational workflows.
     """
-    chat_client = OpenAIChatClient()
+    chat_client = create_dotted_client()
 
     def create_assistant() -> ChatAgent:
         return chat_client.create_agent(
