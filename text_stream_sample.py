@@ -23,6 +23,8 @@ speech_config = speechsdk.SpeechConfig(
 # speech_config = speechsdk.SpeechConfig(
 #     host="ws://localhost:5500/",)
 
+#speech_config = speechsdk.SpeechConfig( host="ws://localhost:5505")
+
 # speech_config = speechsdk.SpeechConfig( subscription = os.getenv("AZURE_TTS_SUBSCRIPTIONKEY") ,
 #                                         region= os.getenv("AZURE_TTS_REGION"))
 

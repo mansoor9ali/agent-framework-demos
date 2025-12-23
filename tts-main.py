@@ -16,7 +16,7 @@ service_region = os.getenv("AZURE_TTS_REGION")
 # Replace with your own subscription key and endpoint, the endpoint is like : "https://YourServiceRegion.api.cognitive.microsoft.com"
 #speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
 
-speech_config = speechsdk.SpeechConfig( host="ws://localhost:5505")
+speech_config = speechsdk.SpeechConfig( host="http://localhost:5505")
 
 audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
 
