@@ -1,75 +1,49 @@
 import os
 import azure.cognitiveservices.speech as speechsdk
-import json
 from dotenv import load_dotenv
 from rich import print
-from rich.logging import RichHandler
-
+from openai import OpenAI
 load_dotenv()
 
-# Creates an instance of a speech config with specified endpoint and subscription key.
-# Replace with your own endpoint and subscription key in config file.
-speech_key = os.getenv("AZURE_TTS_SUBSCRIPTIONKEY")
-speech_endpoint = os.getenv("AZURE_TTS_ENDPOINT")
-service_region = os.getenv("AZURE_TTS_REGION")
-# This example requires environment variables named "SPEECH_KEY" and "ENDPOINT"
-# Replace with your own subscription key and endpoint, the endpoint is like : "https://YourServiceRegion.api.cognitive.microsoft.com"
-#speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+# setup AzureOpenAI client
+gpt_client =  OpenAI(
+    api_key = os.getenv("OPENAI_API_KEY"),
+    base_url = os.getenv("OPENAI_BASE_URL"),
 
-speech_config = speechsdk.SpeechConfig( host="http://localhost:5505")
+)
 
+# Configure for local Docker image
+speech_config = speechsdk.SpeechConfig(host="ws://localhost:5505")
 audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
 
-# The neural multilingual voice can speak different languages based on the input text.
-speech_config.speech_synthesis_voice_name='en-US-AvaMultilingualNeural'
-speech_config.speech_synthesis_voice_name='en-US-JaneNeural'
+speech_config.speech_synthesis_voice_name = 'en-US-JaneNeural'
 
 speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
 
-# Get text from the console and synthesize to the default speaker.
-print("Here is some text that you want to speak >")
-text = "My name is Jane and i am a neural voice"
+# Stream OpenAI response to Speech Synthesizer
+completion = gpt_client.chat.completions.create(
+    model=os.getenv("OPENAI_MODEL_ID"),
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "tell me about gen ai in 100 words"}
+    ],
+    stream=True
+)
 
-speech_synthesis_result = speech_synthesizer.speak_text_async(text).get()
+full_text = ""
+for chunk in completion:
+    if chunk.choices[0].delta.content:
+        text_chunk = chunk.choices[0].delta.content
+        full_text += text_chunk
+        print(text_chunk, end="", flush=True)
+
+# Synthesize complete text
+speech_synthesis_result = speech_synthesizer.speak_text_async(full_text).get()
 
 if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-    print("Speech synthesized for text [{}]".format(text))
+    print("\nSpeech synthesized successfully")
 elif speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
     cancellation_details = speech_synthesis_result.cancellation_details
-    print("Speech synthesis canceled: {}".format(cancellation_details.reason))
-    if cancellation_details.reason == speechsdk.CancellationReason.Error:
-        if cancellation_details.error_details:
-            print("Error details: {}".format(cancellation_details.error_details))
-            print("Did you set the speech resource key and endpoint values?")
-
-
-#
-# '''
-#   For more samples please visit https://github.com/Azure-Samples/cognitive-services-speech-sdk
-# '''
-#
-# import azure.cognitiveservices.speech as speechsdk
-#
-# # Creates an instance of a speech config with specified subscription key and service region.
-# speech_key = "76a4add21b1d479a9cc37d728c775443"
-# service_region = "eastasia"
-#
-# speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
-# # Note: the voice setting will not overwrite the voice element in input SSML.
-# speech_config.speech_synthesis_voice_name = "en-US-AvaMultilingualNeural"
-#
-# text = "Hi, this is Ava Multilingual"
-#
-# # use the default speaker as audio output.
-# speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
-#
-# result = speech_synthesizer.speak_text_async(text).get()
-# # Check result
-# if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-#     print("Speech synthesized for text [{}]".format(text))
-# elif result.reason == speechsdk.ResultReason.Canceled:
-#     cancellation_details = result.cancellation_details
-#     print("Speech synthesis canceled: {}".format(cancellation_details.reason))
-#     if cancellation_details.reason == speechsdk.CancellationReason.Error:
-#         print("Error details: {}".format(cancellation_details.error_details))
-
+    print(f"\nSpeech synthesis canceled: {cancellation_details.reason}")
+    if cancellation_details.error_details:
+        print(f"Error details: {cancellation_details.error_details}")
