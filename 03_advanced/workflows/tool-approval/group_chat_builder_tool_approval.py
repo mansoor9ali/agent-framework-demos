@@ -12,6 +12,8 @@ from agent_framework import (
 )
 from agent_framework.openai import OpenAIChatClient
 
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
+
 """
 Sample: Group Chat Workflow with Tool Approval Requests
 
@@ -98,7 +100,7 @@ def select_next_speaker(state: GroupChatStateSnapshot) -> str | None:
 
 async def main() -> None:
     # 3. Create specialized agents
-    chat_client = OpenAIChatClient()
+    chat_client = create_dotted_client()
 
     qa_engineer = chat_client.create_agent(
         name="QAEngineer",

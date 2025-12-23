@@ -16,6 +16,8 @@ from agent_framework import (
 )
 from agent_framework.openai import OpenAIChatClient
 
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
+
 """
 Sample: Concurrent Workflow with Tool Approval Requests
 
@@ -83,7 +85,7 @@ def get_portfolio_balance() -> str:
 
 async def main() -> None:
     # 3. Create two agents with different tool sets
-    chat_client = OpenAIChatClient()
+    chat_client = create_dotted_client()
 
     research_agent = chat_client.create_agent(
         name="ResearchAgent",

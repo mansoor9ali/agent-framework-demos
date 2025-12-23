@@ -13,6 +13,7 @@ from agent_framework import (
 )
 from agent_framework.openai import OpenAIChatClient
 
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 """
 Sample: Sequential Workflow with Tool Approval Requests
 
@@ -66,7 +67,7 @@ def get_database_schema() -> str:
 
 async def main() -> None:
     # 2. Create the agent with tools (approval mode is set per-tool via decorator)
-    chat_client = OpenAIChatClient()
+    chat_client = create_dotted_client()
     database_agent = chat_client.create_agent(
         name="DatabaseAgent",
         instructions=(

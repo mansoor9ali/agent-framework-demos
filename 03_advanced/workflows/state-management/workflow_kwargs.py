@@ -5,7 +5,10 @@ import json
 from typing import Annotated, Any
 
 from agent_framework import ChatMessage, SequentialBuilder, WorkflowOutputEvent, ai_function
+
 from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 from pydantic import Field
 
 """
@@ -70,7 +73,7 @@ async def main() -> None:
     print("=" * 70)
 
     # Create chat client
-    chat_client = OpenAIChatClient()
+    chat_client = create_dotted_client()
 
     # Create agent with tools that use kwargs
     agent = chat_client.create_agent(

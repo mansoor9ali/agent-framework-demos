@@ -15,8 +15,10 @@ from agent_framework import (
     WorkflowViz,
     handler,
 )
-from agent_framework.azure import AzureOpenAIChatClient
-from azure.identity import AzureCliCredential
+
+from agent_framework.openai import OpenAIChatClient
+
+from utils import create_dotted_client , create_deepseek_client , create_openaichat_client
 from typing_extensions import Never
 
 """
@@ -88,7 +90,7 @@ class AggregateInsights(Executor):
 
 def create_researcher_agent() -> ChatAgent:
     """Creates a research domain expert agent."""
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         instructions=(
             "You're an expert market and product researcher. Given a prompt, provide concise, factual insights,"
             " opportunities, and risks."
@@ -99,7 +101,7 @@ def create_researcher_agent() -> ChatAgent:
 
 def create_marketer_agent() -> ChatAgent:
     """Creates a marketing domain expert agent."""
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         instructions=(
             "You're a creative marketing strategist. Craft compelling value propositions and target messaging"
             " aligned to the prompt."
@@ -110,7 +112,7 @@ def create_marketer_agent() -> ChatAgent:
 
 def create_legal_agent() -> ChatAgent:
     """Creates a legal domain expert agent."""
-    return AzureOpenAIChatClient(credential=AzureCliCredential()).create_agent(
+    return create_dotted_client().create_agent(
         instructions=(
             "You're a cautious legal/compliance reviewer. Highlight constraints, disclaimers, and policy concerns"
             " based on the prompt."
