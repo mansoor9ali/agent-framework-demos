@@ -1,21 +1,23 @@
 import os
 import azure.cognitiveservices.speech as speechsdk
 import json
+from dotenv import load_dotenv
+from rich import print
+from rich.logging import RichHandler
 
-# Creates an instance of a speech config with specified subscription key and endpoint.
-# Replace with your own subscription key and endpoint in config.json.
-# Load the configuration from the config.json file
-with open('config.json', 'r') as config_file:
-    config = json.load(config_file)
+load_dotenv()
 
 # Creates an instance of a speech config with specified endpoint and subscription key.
 # Replace with your own endpoint and subscription key in config file.
-speech_key = config.get("SubscriptionKey")
-speech_endpoint = config.get("Endpoint")
-service_region = "eastasia"
+speech_key = os.getenv("AZURE_TTS_SUBSCRIPTIONKEY")
+speech_endpoint = os.getenv("AZURE_TTS_ENDPOINT")
+service_region = os.getenv("AZURE_TTS_REGION")
 # This example requires environment variables named "SPEECH_KEY" and "ENDPOINT"
 # Replace with your own subscription key and endpoint, the endpoint is like : "https://YourServiceRegion.api.cognitive.microsoft.com"
-speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+#speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+
+speech_config = speechsdk.SpeechConfig( host="ws://localhost:5505")
+
 audio_config = speechsdk.audio.AudioOutputConfig(use_default_speaker=True)
 
 # The neural multilingual voice can speak different languages based on the input text.
@@ -25,8 +27,8 @@ speech_config.speech_synthesis_voice_name='en-US-JaneNeural'
 speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
 
 # Get text from the console and synthesize to the default speaker.
-print("Enter some text that you want to speak >")
-text = input()
+print("Here is some text that you want to speak >")
+text = "My name is Jane and i am a neural voice"
 
 speech_synthesis_result = speech_synthesizer.speak_text_async(text).get()
 

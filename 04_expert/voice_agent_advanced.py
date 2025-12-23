@@ -6,7 +6,7 @@ from typing import Optional
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 
-from utils import create_gptoss120b_client
+from utils import create_dotted_client
 
 
 class AzureVoiceAgent:
@@ -14,7 +14,7 @@ class AzureVoiceAgent:
         load_dotenv()
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
-        self.chat_agent = create_gptoss120b_client().create_agent(
+        self.chat_agent = create_dotted_client().create_agent(
             name="VoiceDemoAgent",
             instructions="You are a helpful voice assistant."
         )
