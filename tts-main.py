@@ -30,20 +30,30 @@ completion = gpt_client.chat.completions.create(
     stream=True
 )
 
-full_text = ""
+sentence_buffer = ""
 for chunk in completion:
     if chunk.choices[0].delta.content:
         text_chunk = chunk.choices[0].delta.content
-        full_text += text_chunk
         print(text_chunk, end="", flush=True)
+        sentence_buffer += text_chunk
 
-# Synthesize complete text
-speech_synthesis_result = speech_synthesizer.speak_text_async(full_text).get()
+        # Synthesize when we have a complete sentence
+        if any(punct in text_chunk for punct in ['.', '!', '?', '\n']):
+            if sentence_buffer.strip():
+                print(f"\n[TTS] Synthesizing: {sentence_buffer.strip()[:50]}...")
+                result = speech_synthesizer.speak_text_async(sentence_buffer.strip()).get()
 
-if speech_synthesis_result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-    print("\nSpeech synthesized successfully")
-elif speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
-    cancellation_details = speech_synthesis_result.cancellation_details
-    print(f"\nSpeech synthesis canceled: {cancellation_details.reason}")
-    if cancellation_details.error_details:
-        print(f"Error details: {cancellation_details.error_details}")
+                if result.reason == speechsdk.ResultReason.Canceled:
+                    cancellation_details = result.cancellation_details
+                    print(f"\n[ERROR] Synthesis canceled: {cancellation_details.reason}")
+                    if cancellation_details.error_details:
+                        print(f"[ERROR] Details: {cancellation_details.error_details}")
+
+                sentence_buffer = ""
+
+# Synthesize any remaining text
+if sentence_buffer.strip():
+    print(f"\n[TTS] Synthesizing final: {sentence_buffer.strip()[:50]}...")
+    result = speech_synthesizer.speak_text_async(sentence_buffer.strip()).get()
+
+print("\n[DONE] Streaming complete")
