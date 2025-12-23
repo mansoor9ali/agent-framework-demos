@@ -1,20 +1,24 @@
 import os
-from openai import AzureOpenAI
+from openai import OpenAI
 import azure.cognitiveservices.speech as speechsdk
+from dotenv import load_dotenv
+from rich import print
+from rich.logging import RichHandler
 
+# Load environment variables from .env file
+load_dotenv()
 # setup AzureOpenAI client
-gpt_client = AzureOpenAI(
-    azure_endpoint=os.getenv("AZURE_OPENAI_API_ENDPOINT"),
-    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-    api_version="2024-02-01"
+gpt_client =  OpenAI(
+    api_key = os.getenv("OPENAI_API_KEY"),
+    base_url = os.getenv("OPENAI_BASE_URL"),
+
 )
 
 # setup speech synthesizer
 # IMPORTANT: MUST use the websocket v2 endpoint
 speech_config = speechsdk.SpeechConfig(
     endpoint=f"wss://{os.getenv('AZURE_TTS_REGION')}.tts.speech.microsoft.com/cognitiveservices/websocket/v2",
-    subscription=os.getenv("AZURE_TTS_API_KEY")
-)
+    subscription=os.getenv("AZURE_TTS_SUBSCRIPTIONKEY"))
 
 # Configure the voice for speech synthesis. For a complete list of available voices,
 # visit https://aka.ms/speech/voices/neural
