@@ -17,6 +17,9 @@
 * **Queries:** "What is the risk profile for the next sprint?", "Who needs approval?", "What are the hidden dependencies?"
 * **Behavior:** The system reads Jira tickets, understands risks, communicates status, takes action, and logs every decision for audit purposes.
 
+![Enterprise Agentic](Agent_Design1.jpg)
+![Enterprise Agentic](Agent_Design2.png)
+![Enterprise Agentic](Agent_Design3.png)
 ---
 
 ## 2. Technical Architecture Layers
