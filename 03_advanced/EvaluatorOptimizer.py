@@ -219,54 +219,56 @@ def should_continue(state: OptimizationState) -> Literal["optimizer", "end"]:
     return "optimizer"
 
 
-# Build the Graph
+if __name__ == '__main__':
 
-builder = StateGraph(OptimizationState)
+    # Build the Graph
 
-builder.add_node("optimizer", generate_description)
-builder.add_node("evaluator", evaluate_description)
+    builder = StateGraph(OptimizationState)
 
-builder.add_edge(START, "optimizer")
-builder.add_edge("optimizer", "evaluator")
+    builder.add_node("optimizer", generate_description)
+    builder.add_node("evaluator", evaluate_description)
 
-builder.add_conditional_edges(
-    "evaluator",
-    should_continue,
-    {
-        "optimizer": "optimizer",
-        "end": END
-    }
-)
+    builder.add_edge(START, "optimizer")
+    builder.add_edge("optimizer", "evaluator")
 
-graph = builder.compile()
+    builder.add_conditional_edges(
+        "evaluator",
+        should_continue,
+        {
+            "optimizer": "optimizer",
+            "end": END
+        }
+    )
 
-print("=" * 70)
-print("EVALUATOR-OPTIMIZER PATTERN: PRODUCT DESCRIPTION")
-print("=" * 70)
-print("Example: Fitness Tracker")
-print("=" * 70)
+    graph = builder.compile()
 
-result = graph.invoke({
-    "product_name": "Fitpulse Pro Smart watch",
-    "product_features": [
-        "Heart rate monitoring",
-        "GPS tracking",
-        "Sleep analysis",
-        "Waterproof to 50m",
-        "7-day battery life",
-        "Smartphone notifications"
-    ],
-    "target_audience": "Health-concious professionals aged 25-45",
-    "current_description": "",
-    "evaluation_result": {},
-    "feedback": "",
-    "iteration_count": 1,
-    "max_iterations": 5,
-    "is_approved": False,
-    "iteration_history": []
-})
+    print("=" * 70)
+    print("EVALUATOR-OPTIMIZER PATTERN: PRODUCT DESCRIPTION")
+    print("=" * 70)
+    print("Example: Fitness Tracker")
+    print("=" * 70)
 
-print(f"\n {'=' * 70}")
-print("FINAL APPROVED DESCRIPTION")
-print(f"{'=' * 70}")
-print(result['current_description'])
+    result = graph.invoke({
+        "product_name": "Fitpulse Pro Smart watch",
+        "product_features": [
+            "Heart rate monitoring",
+            "GPS tracking",
+            "Sleep analysis",
+            "Waterproof to 50m",
+            "7-day battery life",
+            "Smartphone notifications"
+        ],
+        "target_audience": "Health-concious professionals aged 25-45",
+        "current_description": "",
+        "evaluation_result": {},
+        "feedback": "",
+        "iteration_count": 1,
+        "max_iterations": 5,
+        "is_approved": False,
+        "iteration_history": []
+    })
+
+    print(f"\n {'=' * 70}")
+    print("FINAL APPROVED DESCRIPTION")
+    print(f"{'=' * 70}")
+    print(result['current_description'])
