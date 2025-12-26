@@ -1,7 +1,14 @@
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
 
 
+import asyncio
+from dotenv import load_dotenv
+from utils import create_dotted_client
+
+# Load environment variables
+load_dotenv()
 
 
 @tool
@@ -22,7 +29,9 @@ def calculate_tip(bill_amount: float, tip_percentage: float) -> float:
 
     return round(bill_amount * (tip_percentage/100), 2)
 
-llm = ChatOpenAI(model="gpt-4o")
+#llm = ChatOpenAI(model="gpt-4o")
+llm = ChatGoogleGenerativeAI(model="gemini-3-flash-preview")
+
 
 llm_with_tools = llm.bind_tools([
     get_weather,
