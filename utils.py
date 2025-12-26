@@ -2,6 +2,8 @@ import os
 import sys
 
 from agent_framework.openai import OpenAIChatClient
+from agent_framework.azure import AzureOpenAIChatClient
+
 from dotenv import load_dotenv
 from foundry_local import FoundryLocalManager
 from foundry_local.models import DeviceType
@@ -97,4 +99,24 @@ def create_deepseek_client() -> OpenAIChatClient:
         api_key=os.getenv("DEEPSEEK_API_KEY"),
         base_url=os.getenv("DEEPSEEK_BASE_URL"),
         model_id=os.getenv("DEEPSEEK_MODEL_ID"),
+    )
+
+def create_azure_openai_client() -> AzureOpenAIChatClient:
+    """
+    Create and return an AzureOpenAIChatClient instance using environment variables.
+
+    Returns:
+        AzureOpenAIChatClient: Configured Azure OpenAI chat client
+    """
+    endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+    deployment_name = os.getenv("AZURE_OPENAI_THINKING_MODEL")
+    api_key = os.getenv("AZURE_OPENAI_API_KEY")
+    api_version = os.getenv("AZURE_OPENAI_ENDPOINT_VERSION")
+
+
+    return AzureOpenAIChatClient(
+        endpoint=endpoint,
+        deployment_name=deployment_name,
+        api_key=api_key,
+        api_version=api_version
     )
