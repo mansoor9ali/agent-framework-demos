@@ -1,0 +1,8 @@
+[2026-01-10 12:00:00] INFO   APIManager: API Gateway starting
+[2026-01-10 12:00:01] INFO   APIManager: Rate limiting enabled
+[2026-01-10 12:30:00] WARN   APIManager: Request rate increasing (75% of quota)
+[2026-01-10 12:45:00] WARN   APIManager: Request rate at 90% of quota
+[2026-01-10 13:00:00] ERROR  APIManager: Quota exceeded - requests being throttled
+[2026-01-10 13:00:01] ALERT  APIManager: High request volume detected
+[2026-01-10 13:00:02] ERROR  APIManager: Rate limit exceeded for API endpoint /v1/orders
+

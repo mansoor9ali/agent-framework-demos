@@ -1,0 +1,12 @@
+[2026-01-10 11:00:00] INFO   DeploymentManager: Starting deployment of resource 'api-gateway-v2'
+[2026-01-10 11:00:10] INFO   DeploymentManager: Pulling container images
+[2026-01-10 11:00:30] INFO   DeploymentManager: Configuring network settings
+[2026-01-10 11:00:45] ERROR  DeploymentManager: Failed to allocate IP address
+[2026-01-10 11:00:46] ERROR  DeploymentManager: Deployment failure detected in resource 'api-gateway-v2'
+[2026-01-10 11:00:47] ALERT  DeploymentManager: Resource failure - unable to complete deployment
+[2026-01-10 11:00:48] WARN   DeploymentManager: Cleanup required for failed deployment
+
+
+[2026-01-11 02:33:52] ALERT  DevopsAgent: Resource deployment failure detected in 'api-gateway-v2'. Redeploying resource.
+[2026-01-11 02:33:52] INFO   DeploymentManager: Redeployment request submitted.
+[2026-01-11 02:33:52] INFO   DeploymentManager: Service successfully redeployed, resource 'api-gateway-v2' created successfully.

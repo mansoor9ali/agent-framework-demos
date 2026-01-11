@@ -1,0 +1,15 @@
+[2026-01-10 08:15:22] INFO   PaymentService: Starting service initialization
+[2026-01-10 08:15:23] INFO   PaymentService: Connected to database
+[2026-01-10 08:15:24] INFO   PaymentService: Service started successfully
+[2026-01-10 09:30:45] WARN   PaymentService: High memory usage detected (85%)
+[2026-01-10 09:45:12] ERROR  PaymentService: Connection timeout to payment gateway
+[2026-01-10 09:45:15] ERROR  PaymentService: Retry attempt 1 failed
+[2026-01-10 09:45:18] ERROR  PaymentService: Retry attempt 2 failed
+[2026-01-10 09:45:21] ERROR  PaymentService: Retry attempt 3 failed
+[2026-01-10 09:45:22] ALERT  PaymentService: Multiple failures detected - service failure imminent
+[2026-01-10 09:45:25] CRITICAL PaymentService: Service failure - unable to process transactions
+
+
+[2026-01-11 02:33:52] ALERT  DevopsAgent: Multiple failures detected in PaymentService. Restarting service.
+[2026-01-11 02:33:52] INFO   PaymentService: Restart initiated.
+[2026-01-11 02:33:52] INFO   PaymentService: Service restarted successfully.

@@ -1,0 +1,12 @@
+[2026-01-10 10:00:00] INFO   TransactionProcessor: Batch processing started
+[2026-01-10 10:00:05] INFO   TransactionProcessor: Processing order #12345
+[2026-01-10 10:00:10] INFO   TransactionProcessor: Processing order #12346
+[2026-01-10 10:00:15] ERROR  TransactionProcessor: Database constraint violation
+[2026-01-10 10:00:16] ERROR  TransactionProcessor: Transaction failure - unable to commit batch
+[2026-01-10 10:00:17] ALERT  TransactionProcessor: Transaction error detected in batch #4521
+[2026-01-10 10:00:18] WARN   TransactionProcessor: Pending transactions require rollback
+
+
+[2026-01-11 02:33:52] ALERT  DevopsAgent: Transaction failure detected. Rolling back transaction batch.
+[2026-01-11 02:33:52] INFO   TransactionProcessor: Rolling back transaction batch.
+[2026-01-11 02:33:52] INFO   Transaction rollback completed successfully.
