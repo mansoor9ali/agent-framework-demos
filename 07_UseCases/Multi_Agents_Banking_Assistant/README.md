@@ -70,6 +70,7 @@ For complex agents conversation implementation, read more about [Autogen framewo
 
 ### Architecture
 ![HLA](docs/assets/HLA-MCP.png)
+![img.png](img.png)
 The personal banking assistant is designed as a [vertical multi-agent system](./docs/multi-agents/introduction.md), with each agent specializing in a specific functional domain (e.g., account management, transaction history, payments). The architecture consists of the following key components:
 
 - **Copilot Assistant Copilot App (Microservice)**: Serves as the central hub for processing user requests. It's a spring boot application implementing a vertical multi-agent architectures using **langchain4j** to create Agents equipped with tools. in Java the Agent Router to understand user intent from chat interactions and routes the request to the appropriate domain-specific agent.
